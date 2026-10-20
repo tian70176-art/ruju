@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>入局 · 大学生反诈沉浸实验室</title>
+<link rel="stylesheet" href="core/style.css">
+</head>
+<body>
+<div id="app">
+  <aside id="aside">
+    <h2>课堂解说</h2>
+    <div id="aside-body"></div>
+    <div class="aside-foot">1/2/3 选选项 · 空格 继续 · R 翻面 · C 退出课堂模式</div>
+  </aside>
+  <div id="phone">
+    <div class="notch" aria-hidden="true"></div>
+    <div class="statusbar">
+      <span id="sb-time">--:--</span>
+      <span id="class-tag">课堂模式</span>
+      <span id="kiosk-tag">展台模式</span>
+      <span class="sb-right"><span class="sb-ico" aria-hidden="true">▮▮▮</span> <span aria-hidden="true">📶</span> <span aria-label="电量 76%">🔋76%</span></span>
+    </div>
+    <main id="screen" aria-live="polite"></main>
+    <div id="foot">本站为反诈教育模拟。所有聊天、人物、App、资金均为虚构，不收集任何信息。</div>
+    <div id="toast"></div>
+    <div id="modal"></div>
+  </div>
+</div>
+<script src="core/core.js"></script>
+<script src="core/widgets.js"></script>
+<script src="core/engine.js"></script>
+<script src="core/reveal.js"></script>
+<script src="core/real.js"></script>
+<script src="core/inbox.js"></script>
+<script src="core/day2.js"></script>
+<script src="core/manifest.js"></script>
+<script>RJ.boot();</script>
+</body>
+</html>

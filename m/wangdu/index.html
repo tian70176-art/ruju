@@ -1,0 +1,4047 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#121212">
+<title>十赌九骗 · 大学生网赌揭秘实验室</title>
+<style>
+/* ============================================================
+   十赌九骗 · 大学生网赌揭秘实验室
+   单文件 / 零外部依赖 / 断网可运行 / 手机竖屏适配
+   ============================================================ */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#121212; --bg2:#191919; --bg3:#232323; --bg4:#2c2c2c;
+  --gold:#d4af37; --gold2:#f0d97a; --golddim:#7a6420;
+  --red:#c0392b; --red2:#e74c3c; --green:#27ae60;
+  --txt:#ececec; --dim:#8d8d8d; --dim2:#5f5f5f;
+  --felt1:#0e3d27; --felt2:#061a11;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
+  font-family:var(--sans);font-size:15px;line-height:1.6;
+  -webkit-text-size-adjust:100%;overscroll-behavior-y:none}
+body{padding-bottom:60px}
+h1,h2,h3,h4{margin:0 0 .5em;font-weight:700;line-height:1.3}
+a{color:var(--gold)}
+button{font-family:inherit;font-size:inherit;cursor:pointer;border:none;background:none;color:inherit}
+button:disabled{opacity:.4;cursor:not-allowed}
+.hide{display:none!important}
+.mono{font-family:var(--mono)}
+
+/* ---------- 顶部三常量（核心心理设计） ---------- */
+#topbar{position:sticky;top:0;z-index:60;background:linear-gradient(180deg,#1c1c1c,#141414);
+  border-bottom:1px solid #000;box-shadow:0 2px 12px rgba(0,0,0,.7)}
+#topbar .row{display:flex;align-items:center;gap:10px;padding:7px 10px;flex-wrap:wrap}
+.const{display:flex;align-items:baseline;gap:4px;font-size:12px;color:var(--dim);
+  background:#0d0d0d;border:1px solid #2a2a2a;border-radius:6px;padding:3px 8px}
+.const b{font-family:var(--mono);font-size:14px;color:var(--txt);font-weight:600}
+.const.bal b{color:var(--gold)}
+.const.rc b{color:var(--red2)}
+.const.tm b{color:#7fb3d5}
+.const b.pop{animation:pop .45s ease}
+@keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.35);color:#fff}100%{transform:scale(1)}}
+.tb-actions{margin-left:auto;display:flex;gap:6px}
+.tb-actions button{font-size:12px;padding:6px 11px;border-radius:6px;border:1px solid #333;
+  background:#1e1e1e;min-height:32px}
+.tb-actions .btn-dep{border-color:var(--golddim);color:var(--gold)}
+.tb-actions .btn-re{border-color:#5a2020;color:#e08a80;background:#210f0f}
+/* §3.1 返回主页（离开赌场）——顶栏最左，全程可见 */
+.tb-leave{flex:0 0 auto;font-size:12px;padding:6px 11px;border-radius:6px;min-height:32px;
+  border:1px solid #3a2f18;background:#1e1a0c;color:var(--gold)}
+#bonusChip{font-size:11px;color:#ffb84d;border:1px dashed #7a5a10;border-radius:6px;
+  padding:2px 7px;background:#1d1608}
+
+/* ---------- 导航 ---------- */
+#nav{position:sticky;top:0;z-index:55;background:#0f0f0f;border-bottom:1px solid #262626;
+  overflow-x:auto;overflow-y:hidden;white-space:nowrap;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none}
+#nav::-webkit-scrollbar{display:none}
+#nav button{display:inline-block;padding:11px 13px;font-size:13px;color:var(--dim);
+  border-bottom:2px solid transparent;min-height:44px;white-space:nowrap}
+#nav button.on{color:var(--gold);border-bottom-color:var(--gold);background:#161616}
+#nav button.locked{color:#4a4a4a}
+#nav .sep{display:inline-block;width:1px;height:18px;background:#2a2a2a;vertical-align:middle;margin:0 3px}
+
+/* ---------- 布局 ---------- */
+main{max-width:1080px;margin:0 auto;padding:14px 12px 40px}
+.view{display:none}
+.view.on{display:block;animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--bg2);border:1px solid #262626;border-radius:10px;padding:14px;margin-bottom:12px}
+.card.tight{padding:10px}
+h2.page{font-size:19px;color:var(--gold);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+h2.page .sub{font-size:12px;color:var(--dim);font-weight:400}
+.note{font-size:12.5px;color:var(--dim);line-height:1.7}
+.hr{height:1px;background:#262626;margin:12px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.grow{flex:1;min-width:0}
+
+/* ---------- 大厅卡片墙 ---------- */
+#lobbyGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:12px}
+.tcard{position:relative;border-radius:12px;padding:14px;overflow:hidden;cursor:pointer;
+  background:linear-gradient(160deg,#1e1e1e,#141414);border:1px solid #2b2b2b;
+  transition:transform .16s,border-color .16s,box-shadow .16s;min-height:132px;
+  display:flex;flex-direction:column}
+.tcard:hover{transform:translateY(-3px);border-color:var(--golddim);box-shadow:0 8px 24px rgba(0,0,0,.6)}
+.tcard .ico{font-size:26px;line-height:1}
+.tcard .nm{font-size:16px;font-weight:700;margin:6px 0 2px;color:#fff}
+.tcard .ad{font-size:12.5px;color:#b9a06a;line-height:1.5;flex:1}
+.tcard .st{font-size:11.5px;color:var(--dim2);margin-top:8px;display:flex;justify-content:space-between;gap:6px}
+.tcard .st .loss{color:#c07268}
+.tcard.unlocked{border-color:#3a2a2a}
+.tcard .stamp{position:absolute;right:-6px;top:8px;transform:rotate(14deg);
+  font-size:10px;color:#e8b4ac;border:1.5px solid #8a3a30;border-radius:4px;padding:1px 5px;
+  background:rgba(120,30,24,.35);letter-spacing:1px}
+#lobbyFoot{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* ---------- 赌桌通用 ---------- */
+.table-wrap{border-radius:12px;padding:16px 14px;position:relative;
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.07),transparent 62%),
+    radial-gradient(ellipse at 50% 55%,var(--felt1),var(--felt2) 78%);
+  border:1px solid #14361f;box-shadow:inset 0 0 60px rgba(0,0,0,.65)}
+.table-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.table-head h2{font-size:18px;margin:0;color:var(--gold)}
+.eye{margin-left:auto;font-size:12px;border:1px solid #333;border-radius:6px;padding:6px 10px;
+  background:#151515;color:#aaa;min-height:32px}
+.eye.on{border-color:var(--gold);color:var(--gold);background:#1e1a0c}
+.bet-row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.bet-btn{flex:1;min-width:96px;min-height:56px;border-radius:9px;border:1px solid #3a3a3a;
+  background:linear-gradient(180deg,#262626,#1a1a1a);color:#eee;font-size:14px;font-weight:600;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px}
+.bet-btn small{font-size:10.5px;color:var(--dim);font-weight:400}
+.bet-btn:hover:not(:disabled){border-color:var(--gold);background:linear-gradient(180deg,#302a16,#201c0e)}
+.bet-btn.sel{border-color:var(--gold);background:linear-gradient(180deg,#3a3116,#241e0d);color:var(--gold2)}
+.bet-btn.wide{flex:0 0 auto;min-width:74px;min-height:44px;font-size:13px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.chip{min-width:52px;min-height:38px;border-radius:19px;border:1px solid #444;background:#1c1c1c;
+  font-family:var(--mono);font-size:13px;color:#ddd;padding:0 12px}
+.chip.sel{border-color:var(--gold);color:var(--gold);background:#241e0d}
+.chip.bonus{border-color:#7a5a10;color:#ffb84d}
+/* §17.1 筹码档位扩到 ¥5,000 + 全押/加倍 */
+.chip.vip{border-color:#7a6420;color:#f0d97a;background:#1e1a0c;position:relative}
+.chip.vip i{font-style:normal;font-size:8px;line-height:1.3;position:absolute;top:-7px;right:-5px;
+  background:linear-gradient(180deg,#f6e27a,#c9a227);color:#3a2a05;border-radius:3px;padding:0 3px}
+.chip.dbl{border-color:#3a5a7a;color:#8fc7dd}
+.chip.allin{border-color:#7a2a20;color:#ff8a72;background:#1e0d0a}
+.chip.allin.pulse{animation:allinPulse 1.1s ease-in-out infinite}
+@keyframes allinPulse{0%,100%{box-shadow:0 0 0 0 rgba(232,64,47,.75);border-color:#7a2a20}
+  50%{box-shadow:0 0 0 9px rgba(232,64,47,0);border-color:#e8402f;background:#2a100c}}
+/* §17.2 赌徒心理诱导（结算页自曝） */
+.allin-tip{font-size:12px;color:#ff8a72;text-align:center;margin:-3px 0 8px;font-weight:600;
+  animation:blink 1.4s infinite}
+.allin-tip b{color:#ffd0c4}
+.stage{display:flex;align-items:center;justify-content:center;gap:12px;min-height:120px;
+  margin:8px 0;flex-wrap:wrap;padding:8px 0}
+.out{font-size:13px;color:#cfe8d8;min-height:24px;text-align:center;line-height:1.7}
+.out .win{color:var(--green);font-weight:700}
+.out .lose{color:var(--red2);font-weight:700}
+.out .push{color:#d8c98a;font-weight:700}
+.stat-line{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--dim);
+  border-top:1px solid #1e3a29;padding-top:9px;margin-top:9px}
+.stat-line b{color:#bcd8c8;font-family:var(--mono)}
+
+/* ---------- 骰子 ---------- */
+.die{width:58px;height:58px;border-radius:11px;background:linear-gradient(145deg,#fafafa,#d8d8d8);
+  box-shadow:0 4px 14px rgba(0,0,0,.6),inset 0 -3px 8px rgba(0,0,0,.18);position:relative;
+  display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);
+  padding:7px;gap:2px}
+.die i{width:9px;height:9px;border-radius:50%;background:#1b1b1b;align-self:center;justify-self:center;
+  opacity:0}
+.die i.on{opacity:1}
+.die.rolling{animation:droll .38s linear infinite}
+@keyframes droll{0%{transform:rotate(0) translateY(0)}25%{transform:rotate(90deg) translateY(-8px)}
+  50%{transform:rotate(180deg) translateY(0)}75%{transform:rotate(270deg) translateY(-6px)}
+  100%{transform:rotate(360deg) translateY(0)}}
+
+/* ---------- 时时彩 ---------- */
+.balls{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
+.ball{width:46px;height:58px;border-radius:8px;background:linear-gradient(180deg,#2a2a2a,#161616);
+  border:1px solid #3a3a3a;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:25px;font-weight:700;color:var(--gold);position:relative;
+  perspective:400px}
+.ball .flip{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  backface-visibility:hidden}
+.ball.spin{animation:bspin .5s ease}
+@keyframes bspin{0%{transform:rotateX(0)}100%{transform:rotateX(720deg)}}
+.ball.hit{border-color:var(--green);box-shadow:0 0 14px rgba(39,174,96,.6);color:#7ee2a8}
+.countdown{font-family:var(--mono);font-size:12px;color:#8fb8d8}
+.auto-box{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--dim);
+  background:#101010;border:1px solid #262626;border-radius:8px;padding:9px 11px;margin-top:10px}
+.switch{width:46px;height:26px;border-radius:13px;background:#333;position:relative;transition:.2s;flex:0 0 auto}
+.switch::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;
+  background:#999;transition:.2s}
+.switch.on{background:#5a1a1a}
+.switch.on::after{left:23px;background:var(--red2)}
+
+/* ---------- 百家乐 ---------- */
+.hand{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap;min-height:74px}
+.pcard{width:46px;height:66px;border-radius:6px;background:linear-gradient(160deg,#fff,#e2e2e2);
+  color:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-weight:700;box-shadow:0 3px 10px rgba(0,0,0,.5);animation:deal .3s ease}
+@keyframes deal{from{transform:translateY(-22px) rotate(-8deg);opacity:0}to{transform:none;opacity:1}}
+.pcard.red{color:#c0392b}
+.pcard small{font-size:15px;line-height:1}
+.pcard b{font-size:16px;line-height:1.15}
+.handbox{flex:1;min-width:150px;text-align:center}
+.handbox .lbl{font-size:12px;color:#9fc7b0;margin-bottom:5px;letter-spacing:2px}
+.handbox .tot{font-family:var(--mono);font-size:15px;color:var(--gold);margin-top:5px}
+
+/* ---------- 老虎机 ---------- */
+.slot{display:flex;gap:6px;justify-content:center;background:#0a0a0a;border:2px solid var(--golddim);
+  border-radius:12px;padding:10px;box-shadow:inset 0 0 30px rgba(0,0,0,.9)}
+.reel{width:74px;height:92px;overflow:hidden;background:#141414;border-radius:7px;position:relative}
+.reel .strip{position:absolute;left:0;right:0;top:0}
+.reel .sym{height:92px;display:flex;align-items:center;justify-content:center;font-size:44px;line-height:1}
+.reel.win .sym{filter:drop-shadow(0 0 12px #ffd75e)}
+.paytable{font-size:11.5px;color:var(--dim);line-height:1.85;font-family:var(--mono)}
+.paytable b{color:#d8c98a}
+
+/* ---------- 赌球 ---------- */
+.match{display:flex;align-items:center;justify-content:center;gap:14px;font-size:19px;font-weight:700;
+  padding:10px 0}
+.match .vs{color:var(--dim);font-size:13px;font-weight:400}
+.odds{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.odd{flex:1;min-width:88px;min-height:60px;border-radius:9px;border:1px solid #3a3a3a;
+  background:linear-gradient(180deg,#242424,#181818);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;padding:6px}
+.odd b{font-family:var(--mono);font-size:18px;color:var(--gold)}
+.odd span{font-size:11.5px;color:var(--dim)}
+.odd.sel{border-color:var(--gold);background:linear-gradient(180deg,#3a3116,#241e0d)}
+
+/* ---------- 龙虎斗 ---------- */
+.lh{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+.lh .side{flex:1;min-width:120px;text-align:center}
+.lh .side .lbl{font-size:13px;letter-spacing:3px;color:#9fc7b0;margin-bottom:6px}
+
+/* ---------- 红包 ---------- */
+.rp{width:120px;height:150px;margin:0 auto;position:relative;cursor:pointer;
+  transition:transform .5s cubic-bezier(.3,1.4,.5,1)}
+.rp .body{position:absolute;inset:0;border-radius:10px;background:linear-gradient(160deg,#e8402f,#a81f14);
+  box-shadow:0 8px 26px rgba(0,0,0,.6)}
+.rp .flap{position:absolute;left:0;right:0;top:0;height:62px;border-radius:10px 10px 40% 40%/10px 10px 55% 55%;
+  background:linear-gradient(180deg,#ff5c47,#cf2a1a);transform-origin:top;transition:transform .45s;z-index:2}
+.rp .seal{position:absolute;left:50%;top:52px;transform:translateX(-50%);width:38px;height:38px;
+  border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe9a8,#d4af37);z-index:3;
+  display:flex;align-items:center;justify-content:center;font-size:17px;color:#7a1010;font-weight:700;
+  box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.rp.open .flap{transform:rotateX(180deg)}
+.rp.open .seal{opacity:0}
+.rp .amt{position:absolute;left:0;right:0;bottom:24px;text-align:center;font-family:var(--mono);
+  font-size:26px;font-weight:700;color:#ffe9a8;opacity:0;transition:opacity .3s .35s;z-index:1}
+.rp.open .amt{opacity:1}
+.histo{display:flex;align-items:flex-end;gap:4px;height:96px;padding:6px 4px 0;background:#0d0d0d;
+  border:1px solid #262626;border-radius:8px}
+.histo .hb{flex:1;background:linear-gradient(180deg,#3a6b52,#1e3d2e);border-radius:3px 3px 0 0;
+  position:relative;min-height:2px;transition:height .3s}
+.histo .hb.hot{background:linear-gradient(180deg,#e8402f,#8a1f14)}
+.histo .hb span{position:absolute;bottom:-19px;left:0;right:0;text-align:center;font-size:10.5px;
+  color:var(--dim);font-family:var(--mono)}
+.histo-wrap{padding-bottom:22px}
+
+/* ---------- 揭秘卡 ---------- */
+#cardLayer{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.86);display:flex;
+  align-items:center;justify-content:center;padding:16px;overflow-y:auto}
+.reveal{width:100%;max-width:560px;perspective:1400px}
+.rv-wrap{width:100%;max-width:560px;display:flex;flex-direction:column;align-items:center;gap:13px}
+.rv-wrap > .btn{margin:0;width:100%;max-width:320px}
+.rv-inner{position:relative;transform-style:preserve-3d;transition:transform .85s cubic-bezier(.4,.1,.2,1);
+  min-height:330px}
+.reveal.flip .rv-inner{transform:rotateY(180deg)}
+.rv-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;padding:20px;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.rv-front{background:linear-gradient(155deg,#1a1a1a,#0b0b0b);border:1px solid #333}
+.rv-front .nm{font-size:27px;font-weight:700;color:#fff;letter-spacing:3px}
+.rv-front .tag{margin-top:10px;font-size:12px;color:var(--dim);letter-spacing:2px}
+.rv-back{background:#f4f2ec;color:#151515;transform:rotateY(180deg);border:1px solid #d8d4c8;
+  align-items:flex-start;text-align:left;justify-content:flex-start;overflow-y:auto;max-height:76vh}
+.rv-back h3{color:#8a1f14;font-size:16px;letter-spacing:1px;border-bottom:2px solid #8a1f14;
+  padding-bottom:6px;width:100%}
+.rv-back .formula{font-family:var(--mono);font-size:13px;background:#e8e4d8;border-left:3px solid #8a1f14;
+  padding:9px 11px;border-radius:4px;margin:9px 0;white-space:pre-wrap;line-height:1.85;width:100%;
+  overflow-x:auto;color:#1b1b1b}
+.rv-back .punch{font-size:16.5px;font-weight:700;color:#8a1f14;line-height:1.6;margin:10px 0}
+.rv-back p{font-size:13.5px;margin:7px 0;color:#2a2a2a;line-height:1.8}
+.rv-back .tags{margin-top:auto;padding-top:10px;font-size:11.5px;color:#6a6558;width:100%}
+.rv-back .tags i{font-style:normal;border:1px solid #b8b2a0;border-radius:4px;padding:2px 7px;
+  margin-right:5px;display:inline-block;margin-top:4px}
+
+/* ---------- 弹窗 ---------- */
+.modal{position:fixed;inset:0;z-index:150;background:rgba(0,0,0,.82);display:flex;
+  align-items:center;justify-content:center;padding:14px;overflow-y:auto}
+.modal .box{background:#191919;border:1px solid #2e2e2e;border-radius:12px;width:100%;max-width:460px;
+  padding:18px;max-height:92vh;overflow-y:auto;animation:up .28s ease}
+@keyframes up{from{transform:translateY(22px);opacity:0}to{transform:none;opacity:1}}
+.modal .box.gamble{background:linear-gradient(170deg,#2a0d0d,#160707);border-color:#6a1f1f}
+.modal h3{font-size:17px;color:var(--gold)}
+.modal .box.gamble h3{color:#ff6a55}
+.btn{display:block;width:100%;min-height:46px;border-radius:9px;font-size:15px;font-weight:600;
+  margin-top:9px;padding:10px;text-align:center}
+.btn.p{background:linear-gradient(180deg,#d4af37,#a5861f);color:#1a1405}
+.btn.g{background:linear-gradient(180deg,#e8402f,#a81f14);color:#fff}
+.btn.s{background:#242424;border:1px solid #3a3a3a;color:#ddd}
+.btn.shine{position:relative;overflow:hidden}
+.btn.shine::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);
+  animation:sh 1.5s infinite}
+@keyframes sh{0%{left:-60%}60%,100%{left:130%}}
+.tiers{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}
+.tier{border:1px solid #5a2020;border-radius:9px;padding:9px 7px;background:linear-gradient(170deg,#2a1010,#1a0808);
+  text-align:center;min-height:72px;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.tier:hover{border-color:#ff6a55}
+.tier .amt{font-family:var(--mono);font-size:20px;font-weight:700;color:#ff8a72}
+.tier .tag{font-size:11.5px;color:#c98a80;line-height:1.45}
+.tier .gift{font-size:10.5px;color:#ffb84d}
+.alert-list{background:#0f0f0f;border:1px solid #2a2a2a;border-radius:9px;padding:12px 12px 12px 30px;
+  margin:11px 0;font-size:13.5px;line-height:2;color:#e0d6b8}
+.alert-list li{color:#e8dcb8}
+.alert-list b{color:#ff8a72;font-family:var(--mono)}
+.mini{font-size:11px;color:var(--dim2);line-height:1.6}
+.bonus-rule{font-size:10.5px;color:#4a4a4a;line-height:1.6;margin-top:10px;
+  border-top:1px dashed #262626;padding-top:8px}
+
+/* ---------- 亏损横幅 ---------- */
+#banner{position:fixed;left:0;right:0;bottom:0;z-index:120;background:linear-gradient(180deg,#2a0d0d,#160707);
+  border-top:1px solid #7a2a20;padding:11px 14px;transform:translateY(110%);transition:transform .4s;
+  box-shadow:0 -6px 22px rgba(0,0,0,.7)}
+#banner.on{transform:none}
+#banner .t{font-size:13.5px;color:#ffb0a0;line-height:1.65;padding-right:26px}
+#banner .x{position:absolute;right:9px;top:8px;color:#7a5a55;font-size:19px;padding:4px 8px;min-height:32px}
+
+/* ---------- 庄家视角 ---------- */
+#gmPanel{position:fixed;right:10px;bottom:74px;z-index:130;width:min(340px,calc(100vw - 20px));
+  background:#0c0c0c;border:1px solid var(--golddim);border-radius:12px;padding:14px;
+  box-shadow:0 10px 40px rgba(0,0,0,.85);max-height:80vh;overflow-y:auto}
+#gmPanel h4{color:var(--gold);font-size:14px;margin-bottom:8px}
+.gm-stat{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;
+  border-bottom:1px solid #1e1e1e;color:var(--dim)}
+.gm-stat b{font-family:var(--mono);color:#e8c86a}
+.flow{display:flex;align-items:center;justify-content:space-between;gap:5px;margin:12px 0;
+  font-size:11px;color:var(--dim)}
+.flow .nd{text-align:center;flex:1}
+.flow .nd .ic{font-size:21px;display:block}
+.flow .ar{color:var(--golddim);font-size:15px}
+.pump{width:100%;height:7px;background:#1a1a1a;border-radius:4px;overflow:hidden;margin-top:4px}
+.pump i{display:block;height:100%;background:linear-gradient(90deg,#d4af37,#c0392b);width:0;
+  transition:width .8s}
+
+/* ---------- Canvas 图 ---------- */
+canvas{display:block;max-width:100%;border-radius:8px;background:#0d0d0d}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.sim-box{position:relative}
+.sim-legend{font-size:11.5px;color:var(--dim);margin-top:6px;line-height:1.8}
+
+/* ---------- 结果大字 ---------- */
+.big{font-family:var(--mono);font-size:32px;font-weight:700;color:var(--gold);line-height:1.15}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:9px;margin:12px 0}
+.kpi > div{background:#141414;border:1px solid #262626;border-radius:9px;padding:10px;text-align:center}
+.kpi .v{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--gold)}
+.kpi .k{font-size:11px;color:var(--dim);margin-top:3px}
+.verdict{background:linear-gradient(160deg,#1c1508,#0d0a04);border:1px solid var(--golddim);
+  border-radius:11px;padding:18px;margin:14px 0;text-align:center}
+.verdict .q{font-size:17px;line-height:1.85;color:var(--gold2);font-weight:700}
+
+/* ---------- 账单 ---------- */
+.bill-line{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #1f1f1f;
+  font-size:13.5px}
+.bill-line b{font-family:var(--mono);color:#e8c86a}
+.bill-line.total{border-bottom:none;border-top:2px solid var(--red);margin-top:6px;padding-top:11px;font-size:16px}
+.bill-line.total b{color:var(--red2);font-size:22px}
+.steps{position:relative;padding-left:30px;margin:14px 0}
+.steps::before{content:'';position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:#2a2a2a}
+.step{position:relative;padding:9px 0 13px;opacity:.28;transition:opacity .6s}
+.step.on{opacity:1}
+.step::before{content:'';position:absolute;left:-27px;top:13px;width:14px;height:14px;border-radius:50%;
+  background:#2a2a2a;border:2px solid #121212;transition:.5s}
+.step.on::before{background:var(--red);box-shadow:0 0 12px rgba(192,57,43,.85)}
+.step .lv{font-size:11px;color:var(--dim2);letter-spacing:2px}
+.step .ttl{font-size:15px;font-weight:700;color:#e8b4ac}
+.step.on .ttl{color:var(--red2)}
+.step .txt{font-size:12.5px;color:var(--dim);line-height:1.7}
+.law{font-size:13px;line-height:1.95;color:#d8d0c0}
+.law b{color:#e8b4ac}
+.law .hot{color:var(--gold);font-family:var(--mono);font-size:16px}
+
+/* ---------- 收尾 ---------- */
+#finale{position:fixed;inset:0;z-index:300;background:#000;display:flex;align-items:center;
+  justify-content:center;padding:26px;text-align:center}
+#finale .q{font-size:clamp(17px,4.6vw,29px);line-height:2.05;color:#e8e2d0;font-weight:700;letter-spacing:1px}
+#finale .q em{font-style:normal;color:var(--gold)}
+#finale .q .r{color:var(--red2)}
+.fadein{animation:fi 1.6s ease}
+@keyframes fi{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ---------- 朋友圈 ---------- */
+.moments{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:10px;margin-top:12px}
+.mom{background:#1e1e1e;border:1px solid #2c2c2c;border-radius:10px;padding:11px;animation:fi .7s ease backwards}
+.mom .hd{display:flex;gap:8px;align-items:center;margin-bottom:7px}
+.mom .av{width:32px;height:32px;border-radius:5px;background:linear-gradient(140deg,#3a5a7a,#1e2f42);
+  display:flex;align-items:center;justify-content:center;font-size:14px;color:#cfe4f5;flex:0 0 auto}
+.mom .nm{font-size:12.5px;color:#9ab8d8}
+.mom .tx{font-size:12.5px;line-height:1.65;color:#dcdcdc}
+.mom .pic{margin-top:7px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:6px;padding:9px;
+  font-family:var(--mono);font-size:11.5px;color:#6fcf97;line-height:1.75}
+.mom .pic .r{color:#e07a6a}
+
+/* ---------- 关于 ---------- */
+table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+table.tbl th,table.tbl td{border:1px solid #262626;padding:7px 9px;text-align:left}
+table.tbl th{background:#1a1a1a;color:var(--gold);font-weight:600}
+table.tbl td:first-child{color:#cfe0d5;white-space:nowrap}
+
+/* ============================================================
+   §13.1 赌场气质还原（视觉拟真层）
+   ============================================================ */
+/* ---------- 启动页 ---------- */
+#splash{position:fixed;inset:0;z-index:400;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:24px;text-align:center;
+  background:radial-gradient(ellipse at 50% 32%,#2e1c07,#0a0603 68%);
+  /* 兜底：即使脚本异常，启动页也会自行退场，绝不永久挡住应用 */
+  animation:splashOut .5s ease 2.2s forwards}
+@keyframes splashOut{to{opacity:0;visibility:hidden;pointer-events:none}}
+#splash .logo{font-size:44px;filter:drop-shadow(0 0 22px rgba(212,175,55,.65))}
+#splash .nm{font-size:clamp(22px,7vw,30px);font-weight:800;letter-spacing:7px;margin:12px 0 6px;
+  background:linear-gradient(180deg,#f8e88c,#c9a227);-webkit-background-clip:text;
+  background-clip:text;color:transparent}
+#splash .sub{font-size:12.5px;color:#c9a227;letter-spacing:4px}
+#splash .bar{width:min(260px,70vw);height:5px;background:#241a08;border-radius:3px;
+  overflow:hidden;margin:28px 0 9px}
+#splash .bar i{display:block;height:100%;width:0;
+  background:linear-gradient(90deg,#8a6a12,#f8e88c);transition:width .25s linear}
+#splash .pct{font-family:var(--mono);font-size:11.5px;color:#8a7a4a}
+#splash .skip{margin-top:20px;font-size:12px;color:#8a7a4a;border:1px solid #3a2f18;
+  border-radius:6px;padding:8px 18px;background:#140f05;min-height:36px}
+#splash .legal{position:absolute;left:0;right:0;bottom:0;padding:11px 16px;
+  font-size:10.5px;color:#7a7260;line-height:1.65;background:rgba(0,0,0,.55);
+  border-top:1px solid #241a08}
+
+/* ---------- §15.2 冷色忠告改为 👁 点开显示（默认收起） ---------- */
+#eyeCold{font-size:14px;padding:6px 9px;border-radius:6px;border:1px solid #2a2a2a;
+  background:#161616;color:#6f6f6f;min-height:32px;line-height:1}
+#eyeCold.on{border-color:#24404d;color:#8fc7dd;background:#0d1317}
+#coldBar{background:#0b1116;border-bottom:1px solid #1c3340;color:#8fc7dd;
+  font-size:11.5px;padding:6px 12px;line-height:1.65;text-align:center}
+#coldBar b{color:#d6eef8;font-family:var(--mono)}
+
+/* ---------- §15.3 页脚常驻合规小字 ---------- */
+#siteFoot{text-align:center;font-size:10.5px;color:#545454;line-height:1.75;
+  padding:14px 14px 8px;border-top:1px solid #1c1c1c;margin-top:14px}
+#siteFoot b{color:#6f6f6f;font-weight:400}
+
+/* ---------- §13.1 跑马灯 ---------- */
+#marquee{overflow:hidden;background:linear-gradient(90deg,#1a0d0d,#261111,#1a0d0d);
+  border-bottom:1px solid #3a1a1a;height:30px;position:relative}
+#marquee .track{position:absolute;top:0;left:0;white-space:nowrap;will-change:transform;
+  animation:mq 52s linear infinite;font-size:12px;line-height:30px;color:#c98a80}
+#marquee .track b{color:#ffb84d;font-family:var(--mono)}
+#marquee .track span{margin-right:42px}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ---------- Banner 轮播 ---------- */
+#bnr{position:relative;height:88px;border-radius:10px;overflow:hidden;margin-bottom:11px;
+  border:1px solid #4a2418;background:#1a0a0a}
+#bnr .sl{position:absolute;inset:0;opacity:0;transition:opacity .65s;display:flex;
+  align-items:center;gap:12px;padding:0 14px;pointer-events:none}
+#bnr .sl.on{opacity:1;pointer-events:auto}
+#bnr .sl .ic{font-size:28px;flex:0 0 auto}
+#bnr .sl .tt{font-size:15.5px;font-weight:800;color:#fff;line-height:1.3}
+#bnr .sl .ds{font-size:11.5px;color:#ffd9c9;line-height:1.5}
+#bnr .sl .go{margin-left:auto;font-size:11.5px;padding:8px 13px;border-radius:18px;
+  background:#e8402f;color:#fff;font-weight:700;flex:0 0 auto;
+  animation:breath 1.5s ease-in-out infinite}
+@keyframes breath{0%,100%{box-shadow:0 0 0 0 rgba(232,64,47,.75)}
+  50%{box-shadow:0 0 0 9px rgba(232,64,47,0)}}
+#bnr .dots{position:absolute;bottom:5px;left:0;right:0;text-align:center;z-index:2}
+#bnr .dots i{display:inline-block;width:5px;height:5px;border-radius:50%;background:#7a4a3a;margin:0 3px}
+#bnr .dots i.on{background:#ffb84d}
+
+/* ---------- §13.2 双标语系统 ---------- */
+.slogan{border-radius:10px;padding:11px 13px;margin-bottom:9px}
+.modal .slogan{padding:8px 11px;margin-bottom:8px}
+.modal .slogan-red .tx{font-size:12.5px;line-height:1.7}
+.modal .slogan-red .tx.poem{font-size:11.5px;line-height:1.8}
+.modal .slogan-cold .tx{font-size:11.5px;line-height:1.75}
+.modal .tiers{gap:7px;margin:9px 0}
+.modal .btn{min-height:42px;margin-top:7px}
+.slogan-red{background:linear-gradient(170deg,#2a0d0d,#1a0707);border:1px solid #6a1f1f}
+.slogan-red .tx{font-size:14px;color:#ff8a72;line-height:1.85;font-weight:600}
+.slogan-red .tx.poem{font-size:12.5px;color:#ffb0a0;letter-spacing:.4px;line-height:2}
+.slogan-cold{background:#0d1317;border:1px solid #24404d}
+.slogan-cold .tx{font-size:13px;color:#8fc7dd;line-height:1.9}
+.slogan-cold .tx b{color:#d6eef8;font-family:var(--mono)}
+.dual{margin-bottom:11px}
+.dual .hd{font-size:10.5px;letter-spacing:2px;color:var(--dim2);margin-bottom:5px}
+
+/* ---------- §13.1 VIP 等级条 ---------- */
+#vipBar{display:flex;align-items:center;gap:9px;background:#141414;border:1px solid #2e2e2e;
+  border-radius:9px;padding:9px 11px;margin-bottom:11px;flex-wrap:wrap}
+#vipBar .bg{font-size:11px;font-weight:800;padding:3px 10px;border-radius:5px;letter-spacing:1px;
+  background:linear-gradient(180deg,#f6e27a,#c9a227);color:#3a2a05;flex:0 0 auto}
+#vipBar .bg.v0{background:#2a2a2a;color:#8a8a8a}
+#vipBar .pr{flex:1;min-width:80px;height:6px;background:#1e1e1e;border-radius:3px;overflow:hidden}
+#vipBar .pr i{display:block;height:100%;width:0;transition:width .5s;
+  background:linear-gradient(90deg,#8a6a12,#f6e27a)}
+#vipBar .tx{font-size:11px;color:var(--dim);flex:1 1 100%}
+
+/* ---------- §13.1 悬浮客服 ---------- */
+#kefu{position:fixed;right:12px;bottom:12px;z-index:118;width:52px;height:52px;
+  border-radius:50%;background:linear-gradient(160deg,#e8402f,#a81f14);
+  display:flex;align-items:center;justify-content:center;font-size:23px;
+  box-shadow:0 6px 20px rgba(200,40,25,.5);animation:breath 2.2s ease-in-out infinite}
+
+/* ---------- §13.1 真人荷官 / 筹码堆 ---------- */
+.dealer{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.32);
+  border:1px solid #1e4a30;border-radius:9px;padding:7px 11px;margin-bottom:11px}
+.dealer .cam{width:54px;height:34px;border-radius:5px;background:#080d0a;
+  border:1px solid #2a3a30;position:relative;overflow:hidden;flex:0 0 auto}
+.dealer .cam::after{content:'';position:absolute;left:50%;bottom:8px;transform:translateX(-50%);
+  width:19px;height:19px;border-radius:50% 50% 0 0;background:linear-gradient(180deg,#3f6350,#1c3626)}
+.dealer .cam .ld{position:absolute;left:0;right:0;bottom:2px;text-align:center;
+  font-size:7px;color:#5a7a68;letter-spacing:.5px}
+.dealer .tx{font-size:11.5px;color:#7fae93;line-height:1.55}
+.dealer .rec{margin-left:auto;font-size:10px;color:#e07a6a;flex:0 0 auto}
+.dealer .rec::before{content:'●';margin-right:4px;animation:blink 1.3s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+.chipstack{display:flex;justify-content:center;gap:3px;margin:2px 0 8px}
+.chipstack i{width:24px;height:7px;border-radius:4px;display:block}
+.chipstack i:nth-child(3n+1){background:linear-gradient(180deg,#e8402f,#8a1f14)}
+.chipstack i:nth-child(3n+2){background:linear-gradient(180deg,#d4af37,#8a6a12)}
+.chipstack i:nth-child(3n){background:linear-gradient(180deg,#2e86c1,#1a4f75)}
+
+/* ---------- 金币雨 ---------- */
+.coin{position:fixed;z-index:115;font-size:18px;pointer-events:none;
+  animation:fall 1.5s ease-in forwards}
+@keyframes fall{from{transform:translateY(-12px) rotate(0);opacity:1}
+  to{transform:translateY(62vh) rotate(360deg);opacity:0}}
+
+/* ---------- §13.3 提现进度条 ---------- */
+.wdbar{height:9px;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:5px;
+  overflow:hidden;margin:10px 0 6px}
+.wdbar i{display:block;height:100%;width:0;transition:width .6s;
+  background:linear-gradient(90deg,#8a2a1a,#e8402f)}
+.wdbar.hot i{background:linear-gradient(90deg,#c9a227,#f6e27a)}
+
+/* ---------- §13.3 冻结页（软件唯一的法律爆点） ---------- */
+#frozen{position:fixed;inset:0;z-index:350;background:#06080b;overflow-y:auto;
+  padding:26px 18px 46px}
+#frozen .in{max-width:640px;margin:0 auto}
+#frozen .stamp{display:block;text-align:center;margin-bottom:16px}
+#frozen .stamp span{display:inline-block;font-size:14px;font-weight:800;color:#e8402f;
+  border:2px solid #e8402f;border-radius:8px;padding:5px 18px;letter-spacing:4px;
+  transform:rotate(-3deg)}
+#frozen h2{font-size:clamp(20px,5.5vw,26px);color:#e8402f;text-align:center;margin:0 0 6px}
+#frozen h3{font-size:15px;color:var(--gold);margin:22px 0 7px;border-left:3px solid var(--gold);
+  padding-left:9px}
+#frozen p,#frozen li{font-size:13.5px;color:#c6cbd2;line-height:1.95}
+#frozen .why{background:#0c1119;border:1px solid #1e2b3a;border-radius:9px;padding:13px;margin:11px 0}
+#frozen .why b{color:#ff8a72}
+#frozen ol{padding-left:20px;margin:8px 0}
+#frozen ol li{margin-bottom:8px}
+#frozen .law{background:#12100a;border:1px solid #3a2f18;border-radius:9px;padding:13px;margin:11px 0}
+#frozen .law b{color:#e8c86a}
+#frozen .punch{font-size:15.5px;color:#ff8a72;font-weight:800;line-height:1.9;
+  text-align:center;margin:24px 0 0;padding:16px;border-top:1px solid #3a1a1a;
+  border-bottom:1px solid #3a1a1a}
+#frozen .fine{font-size:11px;color:#5f6672;text-align:center;margin-top:18px;line-height:1.7}
+#frozen .btn{margin-top:20px}
+
+/* ---------- 已冻结横幅 ---------- */
+#frozenBar{background:linear-gradient(90deg,#3a0d0d,#1a0606);border-bottom:1px solid #7a2a20;
+  color:#ff8a72;font-size:12px;text-align:center;padding:7px 10px;font-weight:600}
+
+/* ---------- §18.1 账号 ---------- */
+.const.acct{cursor:pointer;border-color:#3a2f18}
+.const.acct b{color:#f6e27a}
+.const.acct:hover{border-color:#7a6420}
+.nick-input{width:100%;height:48px;border-radius:9px;border:1px solid #5a2020;background:#0f0707;
+  color:#ffd9c9;font-size:16px;padding:0 14px;margin:12px 0 4px;font-family:inherit;
+  outline:none;box-sizing:border-box}
+.nick-input::placeholder{color:#7a5a55}
+.nick-input:focus{border-color:#e8402f}
+.acct-row{display:flex;align-items:center;gap:8px;text-align:left;font-size:13px}
+.acct-row .mono{color:#8d8d8d;font-size:11.5px;margin-left:auto}
+.acct-row .flag{color:#ff8a72}
+
+/* ---------- §19 荣誉榜 ---------- */
+.board-seg{border-radius:10px;padding:12px;margin-bottom:10px}
+.board-seg.gold{background:linear-gradient(170deg,#2a1f08,#161005);border:1px solid #6a5420}
+.board-seg.cold{background:#0d1317;border:1px solid #24404d}
+.board-seg h3{font-size:15px;margin-bottom:8px}
+.board-row{font-size:12.5px;color:#e8c86a;line-height:1.85;font-family:var(--mono);
+  border-bottom:1px dashed #3a2f18;padding:4px 0}
+.board-row:last-child{border-bottom:none}
+.board-row b{color:#ffb84d}
+.board-real{font-size:12.5px;color:#8fc7dd;line-height:2;border-bottom:1px dashed #1c3340;padding:4px 0}
+.board-real:last-of-type{border-bottom:none}
+.board-real b{color:#d6eef8;font-family:var(--mono)}
+#cardLayer canvas.record{width:100%;max-width:560px;border-radius:12px;background:#0d0d0d}
+
+/* ---------- 手机适配 ---------- */
+@media (max-width:600px){
+  main{padding:11px 9px 34px}
+  .const{font-size:11px;padding:2px 6px}
+  .const b{font-size:12.5px}
+  .tb-actions button{padding:5px 8px;font-size:11px}
+  #lobbyGrid{grid-template-columns:1fr 1fr;gap:9px}
+  .tcard{padding:11px;min-height:118px}
+  .tcard .ico{font-size:21px}
+  .tcard .nm{font-size:13.5px}
+  .tcard .ad{font-size:11px}
+  .ball{width:38px;height:50px;font-size:20px}
+  .die{width:48px;height:48px;padding:6px}
+  .die i{width:7px;height:7px}
+  .reel{width:56px;height:76px}
+  .reel .sym{height:76px;font-size:34px}
+  .big{font-size:25px}
+  .verdict .q{font-size:15px}
+  .rv-front .nm{font-size:22px}
+  .odds .odd{min-width:0;flex:1 1 30%}
+  .bet-btn{min-width:0;flex:1 1 44%;font-size:13px}
+  .handbox{min-width:120px}
+  #gmPanel{right:6px;left:6px;width:auto;bottom:70px;max-height:66vh}
+  .tiers{gap:7px}
+  .tier .amt{font-size:17px}
+  .modal .box{padding:14px}
+  /* §13 拟真层 */
+  #bnr{height:78px}
+  #bnr .sl .tt{font-size:14px}
+  #bnr .sl .ds{font-size:10.5px}
+  #bnr .sl .go{font-size:10.5px;padding:7px 10px}
+  #kefu{width:46px;height:46px;font-size:20px;right:9px;bottom:9px}
+  #marquee .track{font-size:11px}
+  .dealer .cam{width:46px;height:30px}
+  .dealer .tx{font-size:10.5px}
+  #splash .nm{letter-spacing:4px}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== §13.1 启动页（拟真娱乐城 splash） ===================== -->
+<div id="splash">
+  <div class="logo">🎰</div>
+  <div class="nm">尊 贵 娱 乐 城</div>
+  <div class="sub">尊贵会员 · 极速提现</div>
+  <div class="bar"><i id="spBar"></i></div>
+  <div class="pct" id="spPct">加载中 0%</div>
+  <button class="skip" id="spSkip">跳过 ›</button>
+  <div class="legal">
+    本软件为反赌教育模拟程序。所有充值、彩金、提现均为虚拟数字，不涉及任何真实资金、支付渠道或博彩服务。
+  </div>
+</div>
+
+<!-- ===================== 顶部三常量 ===================== -->
+<div id="topbar">
+  <div class="row">
+    <button id="btnLeave" class="tb-leave" title="离开赌场">◀ 手机</button>
+    <div class="const acct" id="acctChip" title="切换账号">🎫 账号 <b id="cAcct">—</b></div>
+    <div class="const bal">💰 余额 <b id="cBal">¥1,000</b></div>
+    <div class="const rc">今日累计充值 <b id="cRc">¥0</b></div>
+    <div class="const tm">⏱ 已玩 <b id="cTm">0分钟</b></div>
+    <div class="tb-actions">
+      <span id="bonusChip" class="hide">彩金 <b id="cBonus">¥0</b></span>
+      <button id="eyeCold" title="账目">👁</button>
+      <button class="btn-dep" id="btnWithdraw">提现</button>
+      <button class="btn-re" id="btnRecharge">充值</button>
+    </div>
+  </div>
+</div>
+<div id="frozenBar" class="hide"></div>
+<div id="coldBar" class="hide"></div>
+
+<!-- ===================== 导航 ===================== -->
+<nav id="nav"></nav>
+
+<main>
+  <!-- ---------- 大厅 ---------- -->
+  <section class="view on" id="v-lobby">
+    <div id="marquee"><div class="track" id="mqTrack"></div></div>
+    <div id="bnr"></div>
+    <div id="vipBar"></div>
+    <div id="dualBox"></div>
+    <h2 class="page">🎰 大厅 <span class="sub">七张赌桌，同一个钱包。换桌能回血吗？</span></h2>
+    <div class="card tight">
+      <div class="note">
+        初始本金 <b>¥1,000</b>（1 币 = 1 元）。所有赌桌共用这一个钱包——输光了就"换桌回血"，
+        很快你会发现每张桌子都在做同一件事。<br>
+        任意一桌累计亏损满 <b>¥500</b> 会解锁该桌的 <b>揭秘卡</b>（红黑卡，盖"已解密"章）。
+      </div>
+      <div id="lobbyFoot">
+        <button class="btn s" style="width:auto;padding:9px 14px;margin:0" id="btnBoard">🏆 荣誉榜</button>
+        <button class="btn s" style="width:auto;padding:9px 14px;margin:0" id="btnWrench" title="后台">🔧</button>
+        <span class="mini" id="wrenchHint"></span>
+      </div>
+    </div>
+    <div id="lobbyGrid"></div>
+  </section>
+
+  <!-- ---------- 赌桌（JS 渲染） ---------- -->
+  <section class="view" id="v-dice"></section>
+  <section class="view" id="v-ssc"></section>
+  <section class="view" id="v-bac"></section>
+  <section class="view" id="v-slot"></section>
+  <section class="view" id="v-sport"></section>
+  <section class="view" id="v-dragon"></section>
+  <section class="view" id="v-redpack"></section>
+
+  <!-- ---------- 策略实验室 ---------- -->
+  <section class="view" id="v-strategy">
+    <h2 class="page">🧪 策略实验室 <span class="sub">4 种下注策略 × 1,000 名玩家 × 1,000 局</span></h2>
+    <div class="card tight">
+      <div class="note">
+        统一条件：起始资金 <b>¥1,000</b>，每局底注 <b>¥10</b>，轮盘"大小单双"胜率 <b>48.65%</b>
+        （欧洲轮盘 18/37，庄家优势 2.70%）。资金不足一注即判定破产。<br>
+        倍投法遵守真实赌场规则：<b>台面限额 ¥500</b>。
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn p" style="width:auto;padding:11px 20px;margin:0" id="btnRunStrat">▶ 开始模拟 4,000,000 局</button>
+        <span class="mini" id="stratStatus"></span>
+      </div>
+    </div>
+    <div class="card hide" id="stratResult">
+      <div id="stratKpi" class="kpi"></div>
+      <div class="grid2" id="stratCharts"></div>
+      <div class="verdict">
+        <div class="q">可选停时定理（白话版）：对于期望为负的游戏，不存在任何下注策略和任何"见好就收"时机，能把期望变成正数。策略只能改变你死的方式，不能改变你死。</div>
+      </div>
+      <div class="card tight" style="margin:0">
+        <button class="btn s" style="margin:0" id="btnDerive">📐 展开推导：赌徒破产问题</button>
+        <div class="hide" id="deriveBox" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- 万人模拟器 ---------- -->
+  <section class="view" id="v-sim">
+    <h2 class="page">🌧 万人模拟器 <span class="sub">10,000 名玩家 · 资金轨迹雨</span></h2>
+    <div class="card tight">
+      <div class="note">
+        10,000 名玩家，每人起始 <b>¥1,000</b>，平注 <b>¥10</b>，最多 <b>2,000 局</b>。
+        底注游戏：<b id="simGameName">体育赌球</b>（庄家优势 <b id="simEdge">4.05%</b>）。
+      </div>
+      <div class="row" style="margin-top:10px">
+        <select id="simGame" class="chip" style="min-width:150px;height:40px;padding:0 10px;border-radius:8px;color:#ddd;background:#1c1c1c"></select>
+        <button class="btn p" style="width:auto;padding:11px 20px;margin:0" id="btnRunSim">▶ 生成 10,000 名玩家</button>
+        <span class="mini" id="simStatus"></span>
+      </div>
+    </div>
+    <div class="card hide" id="simResult">
+      <div class="kpi" id="simKpi"></div>
+      <div class="sim-box"><canvas id="cvRain" width="1000" height="420"></canvas></div>
+      <div class="sim-legend">
+        每条线 = 一名玩家的资金轨迹（¥0 → ¥1,000+）。越红越接近破产，越绿越是"赢家"。
+        跑完后大部分线会沉到底部——这就是大数定律在 10,000 人身上的形状。
+      </div>
+      <div class="hr"></div>
+      <div class="row">
+        <button class="btn s shine" style="width:auto;padding:11px 18px;margin:0" id="btnMoments">📱 看看朋友圈</button>
+        <span class="mini">他们今晚都在晒赢钱截图。</span>
+      </div>
+      <div id="momentsBox"></div>
+    </div>
+  </section>
+
+  <!-- ---------- 人生账单 ---------- -->
+  <section class="view" id="v-bill">
+    <h2 class="page">🧾 人生账单 <span class="sub">数据来自你本次游玩的真实记录</span></h2>
+    <div class="card" id="billBox"></div>
+    <div class="card">
+      <h3 style="color:var(--gold);font-size:16px">🪜 债务滑坡阶梯</h3>
+      <div class="note">五级台阶，一步都不会跳过。点一下，看看每一级长什么样。</div>
+      <div class="steps" id="stepsBox"></div>
+      <button class="btn s" style="width:auto;padding:10px 16px;margin:0" id="btnStepNext">点亮下一级 →</button>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--gold);font-size:16px">⚖️ 法律与求助</h3>
+      <div class="law" id="lawBox"></div>
+    </div>
+    <div class="card tight" style="text-align:center">
+      <button class="btn g" style="margin:0" id="btnFinale">看完了，说一句实话 →</button>
+    </div>
+    <div class="card tight" style="text-align:center">
+      <button class="btn p" style="width:100%;margin:0;padding:14px;font-size:15px" id="btnLeaveBill">离开赌场，看骗子的剧本</button>
+    </div>
+  </section>
+
+  <!-- ---------- 关于 ---------- -->
+  <section class="view" id="v-about">
+    <h2 class="page">📖 关于本软件 <span class="sub">理论知识点对照表</span></h2>
+    <div class="card">
+      <div class="note">
+        这是一个<b>反赌宣传教育软件</b>。表面是可玩的赌场游戏，实际每张赌桌都是一次概率论解剖。
+        所有随机过程都在你的浏览器里真实发生，没有任何网络请求，断网可运行。
+      </div>
+      <div class="hr"></div>
+      <table class="tbl" id="theoryTbl"></table>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--gold);font-size:16px">🧮 全局参数速查</h3>
+      <table class="tbl" id="paramTbl"></table>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--gold);font-size:16px">🔬 实算复核说明</h3>
+      <div class="note">
+        本软件所有庄家优势、期望值、破产率均由 <b>蒙特卡洛模拟</b> 独立核算，
+        与各赌桌揭秘卡上标注的理论值对照。七张赌桌的理论参数全部来自古典概型、
+        中心极限定理或标准赌戏规则表，可手工验算。<br><br>
+        老虎机的符号权重经过一次 RTP 校准：原始权重下返还率仅 46.18%，
+        为使 RTP 落入真实老虎机的 90–95% 区间，对 🍒 与 🐈‍⬛ 权重做了微调，
+        最终 RTP = <b>92.00%</b>，庄家优势 <b>8.00%</b>。校准过程写在源码注释里。
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ===================== §15.3 页脚常驻合规小字 ===================== -->
+<footer id="siteFoot">
+  本站为反诈教育模拟。所有聊天、人物、App、资金均为虚构，不收集任何信息。
+</footer>
+
+<!-- ===================== 亏损横幅 ===================== -->
+<div id="banner"><span class="x" id="bannerX">×</span><div class="t" id="bannerT"></div></div>
+
+<!-- ===================== 弹窗层（JS 注入） ===================== -->
+<div id="modalLayer"></div>
+<div id="cardLayer" class="hide"></div>
+<div id="gmPanel" class="hide"></div>
+<div id="finale" class="hide"></div>
+<div id="frozen" class="hide"></div>
+<button id="kefu" title="在线客服">💬</button>
+
+<script>
+/* ============================================================================
+   十赌九骗 · 大学生网赌揭秘实验室
+   ----------------------------------------------------------------------------
+   全部逻辑内联，零外部依赖。随机过程全部在本地真实发生。
+   ============================================================================ */
+'use strict';
+
+/* ---------------------------------------------------------------- 工具 */
+const $  = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.prototype.slice.call((r || document).querySelectorAll(s));
+const el = (tag, cls, html) => { const n = document.createElement(tag);
+  if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
+const yuan = n => '¥' + (Math.round(n * 100) / 100).toLocaleString('zh-CN', {maximumFractionDigits:2});
+const yuan0 = n => '¥' + Math.round(n).toLocaleString('zh-CN');
+const pct = (n, d) => (n * 100).toFixed(d == null ? 2 : d) + '%';
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const rnd = n => Math.floor(Math.random() * n);          // [0, n)
+const pick = a => a[rnd(a.length)];
+const ri = (a, b) => a + rnd(b - a + 1);                 // 闭区间整数
+function shuffle(a){ for (let i = a.length - 1; i > 0; i--){ const j = rnd(i + 1);
+  const t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+
+/* ---------------------------------------------------------------- 存储 */
+const Store = (() => {
+  let mem = {}, ok = false;
+  try { localStorage.setItem('__t', '1'); localStorage.removeItem('__t'); ok = true; } catch (e) { ok = false; }
+  return {
+    ok: ok,
+    get(k, d){ try { const v = ok ? localStorage.getItem(k) : mem[k];
+      return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v){ try { const s = JSON.stringify(v);
+      if (ok) localStorage.setItem(k, s); else mem[k] = s; } catch (e) { /* 静默降级 */ } },
+    del(k){ try { if (ok) localStorage.removeItem(k); else delete mem[k]; } catch (e) {} }
+  };
+})();
+
+/* ============================================================================
+   §18 v1.5 账号系统：零后端的"伪账号" + 哈希定命
+   不做真账号（无密码、无后端、无网络），用昵称的确定性哈希在本地推出
+   "这个账号的命运参数"——等价于服务端分配，代价为零，断网可用。
+   ============================================================================ */
+const K_ACCTS = 'ag.accts', K_CUR = 'ag.current';
+const saveKeyOf = nick => 'ag.save.' + nick;
+
+/* FNV-1a 32 位哈希：纯 JS、确定性、无依赖 */
+function fnv1a(str){
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++){
+    h ^= str.charCodeAt(i);
+    h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+  }
+  return h >>> 0;
+}
+/* 昵称规范化：trim → 小写 → 只保留中文/字母/数字 → 限长 1–12 */
+function normalizeNick(s){
+  return String(s == null ? '' : s).trim().toLowerCase()
+    .replace(/[^一-龥a-z0-9]/g, '').slice(0, 12);
+}
+/* 哈希定命：同一昵称在任何设备上算出的参数完全一致 */
+function accountFate(nick){
+  const h = fnv1a(nick);
+  return {
+    nick: nick,
+    h: h,
+    id: h % 900000 + 100000,                             // 6 位账号编号
+    watch: (h % 100) < 10,                               // 10% 重点关照
+    fishQuota: 300 + (Math.floor(h / 100) % 5) * 100,    // 养鱼期额度 ¥300–700
+    fishMult: 1.20 + (h % 3) * 0.05,                     // 养鱼期倍率 1.20/1.25/1.30
+    killMult: 0.70 + (Math.floor(h / 1000) % 5) * 0.01   // 杀猪期倍率 0.70–0.74
+  };
+}
+let ACCT = null;                                          // 当前账号的命运参数
+let pendingWrench = false;                                // 由 hash #wrench 触发的"进入账号后开后台"
+/* §3.1 页面 hash 解析：支持 #nick=xxx、#wrench，以及 #nick=xxx&wrench */
+function hashQuery(){
+  const out = {};
+  String(location.hash || '').replace(/^#/, '').split('&').forEach(part => {
+    if (!part) return;
+    const i = part.indexOf('=');
+    const raw = i < 0 ? part : part.slice(0, i);
+    let v = i < 0 ? '1' : part.slice(i + 1);
+    try { v = decodeURIComponent(v); } catch (e) { v = part.slice(i + 1); }
+    out[raw] = v;
+  });
+  return out;
+}
+function acctList(){ const a = Store.get(K_ACCTS, []); return Array.isArray(a) ? a : []; }
+function rememberAcct(nick){
+  const l = acctList();
+  if (l.indexOf(nick) < 0){ l.push(nick); Store.set(K_ACCTS, l); }
+}
+/* 提现冻结门槛按账号标签定（§18.3） */
+function freezeThreshold(){
+  return ACCT && ACCT.watch
+    ? { recharge: 500,  balance: 1000 }
+    : { recharge: 1000, balance: 2000 };
+}
+/* 未注册时的兜底命运参数（与 v1.4 一致） */
+function acctFate(){
+  return ACCT || { nick:'', id:0, watch:false, fishQuota:500, fishMult:1.25, killMult:0.72 };
+}
+const FISH_MAX_ROUNDS = 20;      // 养鱼期最多 20 局
+
+/* ---------------------------------------------------------------- 换算基准表（§3.2） */
+const CONV = {
+  meal:   { unit: 15,   name: '学校食堂一顿饭' },
+  lemon:  { unit: 4,    name: '蜜雪冰城柠檬水' },
+  phone:  { unit: 50,   name: '一个月手机话费' },
+  wage:   { unit: 20,   name: '父母工作一小时' },
+  month:  { unit: 1500, name: '一个月生活费' },
+  year:   { unit: 8000, name: '一学年学费+住宿' },
+  shoe:   { unit: 500,  name: '一双主流跑鞋' },
+  mobile: { unit: 4500, name: '一部主流手机' }
+};
+const FUND_RATE = 0.015;   // 货币基金年化 1.5%
+
+/* ---------------------------------------------------------------- 全局状态 */
+const S = {
+  balance: 1000,        // 真实余额（可提现——理论上）
+  bonus: 0,             // 彩金（不可提现，下注优先扣除）
+  recharged: 0,         // 今日累计充值（真实充值额，不含彩金）
+  bankruptDeclared: false, // 已宣告破产（资金低于最小下注额），充值后解除
+  totalStaked: 0,       // 累计总下注额
+  totalReturned: 0,     // 累计返还额
+  totalBetVolume: 0,    // 累计有效投注（用于流水门槛）
+  bankruptCount: 0,     // 破产次数
+  seconds: 0,           // 本次游玩时长（秒）
+  tableLoss: {},        // 每桌累计亏损
+  tableStake: {},       // 每桌累计流水
+  unlocked: {},         // 已解锁揭秘卡
+  bonusGiven: false,    // 今日是否已发首充彩金
+  loseStreak: 0,        // 当前连败
+  bestLoseStreak: 0,    // 最长连败
+  maxSingleLoss: 0,     // 最大单次亏损
+  bustAtSecond: null,   // 最快破产用时（秒）
+  firstBetSecond: null, // 第一次下注的时刻
+  withdrawStage: 0,     // 提现话术轮换
+  wdStage: 0,           // §13.3 提现剧本阶段：0 未提现 / 1 已给甜头 / 2 流水门槛
+  rechargeCount: 0,     // 累计真实充值次数（离开赌场时计入沉没成本）
+  frozen: false,        // §13.3 阶段 3：账户已冻结（永久，只能进结算页）
+  kefuN: 0,
+  lastTier: 0,          // 上次选择的充值档位（§17.2 输光后默认跳上一档）
+  redpack: { tails: [0,0,0,0,0,0,0,0,0,0], n: 0, sum: 0, hit: 0 },
+  timeWarned: 0,
+  lastLossAmount: 0
+};
+const TABLE_LOSS = S.tableLoss, TABLE_STAKE = S.tableStake;
+
+/* 各桌累计亏损（用于揭秘卡解锁与大厅展示） */
+const MIN_BET = 10;                 // 全场最小下注额，低于它就无法继续下注 = 破产
+function addTableResult(tid, stake, returned){
+  if (S.firstBetSecond == null) S.firstBetSecond = S.seconds;
+  const net = returned - stake;                   // >0 盈利, <0 亏损
+  S.totalStaked += stake;
+  S.totalReturned += returned;
+  S.totalBetVolume += stake;
+  TABLE_STAKE[tid] = (TABLE_STAKE[tid] || 0) + stake;
+  if (net < 0){
+    TABLE_LOSS[tid] = (TABLE_LOSS[tid] || 0) + (-net);
+    S.loseStreak++;
+    if (S.loseStreak > S.bestLoseStreak) S.bestLoseStreak = S.loseStreak;
+    if (-net > S.maxSingleLoss) S.maxSingleLoss = -net;
+    S.lastLossAmount = -net;
+    if (-net >= 200) showLossBanner(-net);
+  } else if (net > 0){
+    S.loseStreak = 0;
+  }
+  if (TABLE_LOSS[tid] >= 500 && !S.unlocked[tid]) unlockCard(tid);
+  checkBankrupt();
+  save(); refreshTopbar(); renderLobby(); refreshAllInPulse();
+}
+/* 资金低于最小下注额即视为破产；充值后自动解除，避免重复计数 */
+function checkBankrupt(){
+  if (wallet() < MIN_BET){
+    if (!S.bankruptDeclared){ S.bankruptDeclared = true; onBankrupt(); }
+  } else {
+    S.bankruptDeclared = false;
+  }
+}
+
+/* ---------------------------------------------------------------- 钱包 */
+function wallet(){ return S.balance + S.bonus; }
+/* 下注：优先扣彩金 */
+function spend(n){
+  if (n > wallet()) return false;
+  const fromBonus = Math.min(S.bonus, n);
+  S.bonus -= fromBonus;
+  S.balance -= (n - fromBonus);
+  return true;
+}
+/* 返还：进真实余额 */
+function gain(n){ S.balance += n; }
+function canBet(n){ return wallet() >= n; }
+
+function onBankrupt(){
+  S.bankruptCount++;
+  if (S.firstBetSecond != null && S.bustAtSecond == null){
+    S.bustAtSecond = S.seconds - S.firstBetSecond;
+    if (S.bustAtSecond < 0) S.bustAtSecond = S.seconds;
+  }
+  saveBoard(); save();
+}
+
+/* ------------------------------------------- 荣誉榜 / 本机排行榜（§18.5 随账号存档） */
+const BLANK_BOARD = () => ({ fastBust:null, maxLoss:0, maxStreak:0, rechargeKing:0, busts:0 });
+let BOARD = BLANK_BOARD();
+function saveBoard(){
+  BOARD.busts = S.bankruptCount;
+  if (S.bustAtSecond != null && (BOARD.fastBust == null || S.bustAtSecond < BOARD.fastBust))
+    BOARD.fastBust = S.bustAtSecond;
+  if (S.maxSingleLoss > BOARD.maxLoss) BOARD.maxLoss = S.maxSingleLoss;
+  if (S.bestLoseStreak > BOARD.maxStreak) BOARD.maxStreak = S.bestLoseStreak;
+  if (S.recharged > BOARD.rechargeKing) BOARD.rechargeKing = S.recharged;
+}
+
+/* ---------------------------------------------------------------- 存档 */
+function save(){
+  if (!ACCT) return;
+  saveBoard();
+  Store.set(saveKeyOf(ACCT.nick), {
+    balance: S.balance, bonus: S.bonus, recharged: S.recharged,
+    totalStaked: S.totalStaked, totalReturned: S.totalReturned, totalBetVolume: S.totalBetVolume,
+    bankruptCount: S.bankruptCount, seconds: S.seconds, tableLoss: S.tableLoss,
+    tableStake: S.tableStake, unlocked: S.unlocked, bonusGiven: S.bonusGiven,
+    bestLoseStreak: S.bestLoseStreak, maxSingleLoss: S.maxSingleLoss,
+    redpack: S.redpack, cheat: CHEAT.save(), day: todayKey(), board: BOARD,
+    wdStage: S.wdStage, rechargeCount: S.rechargeCount, frozen: S.frozen, lastTier: S.lastTier
+  });
+}
+function todayKey(){ const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+function load(){
+  if (!ACCT) return;
+  const d = Store.get(saveKeyOf(ACCT.nick), null);
+  if (!d) return;
+  if (d.day !== todayKey()){                    // 跨天：今日累计充值归零，其余保留
+    d.recharged = 0; d.bonusGiven = false;
+  }
+  ['balance','bonus','recharged','totalStaked','totalReturned','totalBetVolume','bankruptCount',
+   'seconds','bonusGiven','bestLoseStreak','maxSingleLoss','wdStage','rechargeCount','frozen',
+   'lastTier'].forEach(k => {
+    if (d[k] !== undefined) S[k] = d[k];
+  });
+  if (d.tableLoss)   Object.assign(S.tableLoss, d.tableLoss);
+  if (d.tableStake)  Object.assign(S.tableStake, d.tableStake);
+  if (d.unlocked)    Object.assign(S.unlocked, d.unlocked);
+  if (d.redpack)     S.redpack = d.redpack;
+  if (d.board)       BOARD = Object.assign(BLANK_BOARD(), d.board);
+  if (d.cheat) CHEAT.load(d.cheat);
+}
+/* 切换账号时把内存状态清回初始值（§18.5 各账号完全隔离） */
+function resetState(){
+  S.balance = 1000; S.bonus = 0; S.recharged = 0; S.bankruptDeclared = false;
+  S.totalStaked = 0; S.totalReturned = 0; S.totalBetVolume = 0;
+  S.bankruptCount = 0; S.seconds = 0; S.bonusGiven = false;
+  S.loseStreak = 0; S.bestLoseStreak = 0; S.maxSingleLoss = 0;
+  S.bustAtSecond = null; S.firstBetSecond = null;
+  S.withdrawStage = 0; S.wdStage = 0; S.rechargeCount = 0; S.frozen = false;
+  S.lastTier = 0; S.kefuN = 0; S.timeWarned = 0; S.lastLossAmount = 0;
+  Object.keys(S.tableLoss).forEach(k => delete S.tableLoss[k]);
+  Object.keys(S.tableStake).forEach(k => delete S.tableStake[k]);
+  Object.keys(S.unlocked).forEach(k => delete S.unlocked[k]);
+  S.redpack = { tails:[0,0,0,0,0,0,0,0,0,0], n:0, sum:0, hit:0 };
+  BOARD = BLANK_BOARD();
+  CHEAT.reset();
+}
+/* ============================================================================
+   §2 赌桌元数据 / 导航
+   ============================================================================ */
+const TABLES = [
+  { id:'dice',    icon:'🎲', name:'骰宝 · 大小单双', short:'骰宝',
+    ad:'微聊群里最火的玩法，三颗骰子一分钟上手，大小随便押！',
+    edge:0.0278, edgeNote:'豹子通吃', view:'v-dice' },
+  { id:'ssc',     icon:'🔢', name:'时时彩 · 数字彩', short:'时时彩',
+    ad:'5 秒一期全天候开奖，新人前三把必中，跟计划稳赚！',
+    edge:0.01, edgeNote:'大小 1% / 独胆 2%', view:'v-ssc' },
+  { id:'bac',     icon:'🃏', name:'百家乐', short:'百家乐',
+    ad:'VIP 厅同款，8 倍和局一把回本，真人荷官在线发牌！',
+    edge:0.0106, edgeNote:'押庄 1.06% / 押和 14.36%', view:'v-bac' },
+  { id:'slot',    icon:'🎰', name:'老虎机', short:'老虎机',
+    ad:'随时拉一把，最高 500 倍，昨晚刚爆出大奖！',
+    edge:0.08, edgeNote:'RTP 92%', view:'v-slot' },
+  { id:'sport',   icon:'⚽', name:'体育赌球', short:'赌球',
+    ad:'大赛期间注册送彩金，跟单大神带你飞，赔率全网最高！',
+    edge:0.0405, edgeNote:'抽水 4.22%', view:'v-sport' },
+  { id:'dragon',  icon:'🐉', name:'龙虎斗', short:'龙虎斗',
+    ad:'最公平的玩法没有之一，5 秒一局，刺激到停不下来！',
+    edge:0.0374, edgeNote:'8 副牌真发牌 · 和局退半', view:'v-dragon' },
+  { id:'redpack', icon:'🧧', name:'红包扫雷', short:'红包扫雷',
+    ad:'进群就送红包，抢到就是你的，中雷才赔，手气好稳赚！',
+    edge:0.50, edgeNote:'不对称赔率', view:'v-redpack' }
+];
+const T = {}; TABLES.forEach(t => T[t.id] = t);
+const EDGE = {}; TABLES.forEach(t => EDGE[t.id] = t.edge);
+
+const NAV = [
+  { id:'v-lobby',    label:'🏛 大厅' },
+  { sep:1 },
+  ...TABLES.map(t => ({ id:t.view, label:t.icon + ' ' + t.short, tid:t.id })),
+  { sep:1 },
+  { id:'v-strategy', label:'🧪 策略实验室' },
+  { id:'v-sim',      label:'🌧 万人模拟器' },
+  { id:'v-bill',     label:'🧾 人生账单' },
+  { id:'v-about',    label:'📖 关于/结算' }
+];
+let curView = 'v-lobby';
+const viewHooks = {};      // viewId -> {enter, leave}
+
+function buildNav(){
+  const nav = $('#nav');
+  nav.innerHTML = '';
+  NAV.forEach(n => {
+    if (n.sep){ nav.appendChild(el('span', 'sep')); return; }
+    const b = el('button', '', n.label);
+    b.dataset.view = n.id;
+    if (n.tid) b.dataset.tid = n.tid;
+    b.onclick = () => go(n.id);
+    nav.appendChild(b);
+  });
+  syncNav();
+}
+function syncNav(){
+  $$('#nav button').forEach(b => {
+    b.classList.toggle('on', b.dataset.view === curView);
+    const tid = b.dataset.tid;
+    b.classList.toggle('locked', !!(tid && TABLE_LOSS[tid] >= 500 && !S.unlocked[tid]));
+  });
+}
+function go(viewId){
+  if (curView === viewId) return;
+  const prev = viewHooks[curView];
+  if (prev && prev.leave) prev.leave();
+  $$('.view').forEach(v => v.classList.toggle('on', v.id === viewId));
+  curView = viewId;
+  syncNav();
+  const hook = viewHooks[viewId];
+  if (hook && hook.enter) hook.enter();
+  closeGmPanel();
+  window.scrollTo(0, 0);
+}
+
+/* ============================================================================
+   §2 顶部三常量
+   ============================================================================ */
+function refreshTopbar(){
+  const ac = $('#cAcct');
+  if (ac) ac.textContent = ACCT ? ACCT.id : '—';
+  const b = $('#cBal');
+  const txt = yuan0(S.balance);
+  if (b.textContent !== txt){ b.textContent = txt; b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
+  $('#cRc').textContent = yuan0(S.recharged);
+  const m = Math.floor(S.seconds / 60);
+  $('#cTm').textContent = m < 60 ? m + '分钟' : Math.floor(m / 60) + '小时' + (m % 60) + '分';
+  const chip = $('#bonusChip');
+  chip.classList.toggle('hide', S.bonus <= 0);
+  $('#cBonus').textContent = yuan0(S.bonus);
+}
+setInterval(() => {
+  S.seconds++;
+  if (S.seconds % 15 === 0) save();
+  refreshTopbar();
+  const half = Math.floor(S.seconds / 1800);
+  if (half > S.timeWarned){
+    S.timeWarned = half;
+    timeCostWarn(half * 30);
+  }
+}, 1000);
+
+function timeCostWarn(mins){
+  openModal(
+    '<h3>⏱ 你已经玩了 ' + mins + ' 分钟</h3>' +
+    '<div class="note" style="font-size:14px;color:#d8d0c0;line-height:2;margin-top:10px">' +
+      '这够看完一章概率论。<br>真实的赌徒，一坐就是一夜。' +
+    '</div>' +
+    '<div class="mini" style="margin-top:12px">本次已玩 <b>' + Math.floor(S.seconds/60) +
+      ' 分钟</b>，累计充值 <b>' + yuan0(S.recharged) + '</b>，当前余额 <b>' + yuan0(S.balance) + '</b>。</div>' +
+    '<button class="btn s" data-close>继续玩（我还能赢回来）</button>' +
+    '<button class="btn p" id="tcLeave">退出赌桌，去做点别的</button>'
+  );
+  /* §3.1-4：这个按钮改为真的离开赌场（回主页看结局） */
+  const tc = $('#tcLeave');
+  if (tc) tc.onclick = leaveCasino;
+}
+
+/* ============================================================================
+   弹窗基础设施
+   ============================================================================ */
+function openModal(html, cls, onClose){
+  const layer = $('#modalLayer');
+  const m = el('div', 'modal');
+  const box = el('div', 'box' + (cls ? ' ' + cls : ''), html);
+  m.appendChild(box);
+  layer.appendChild(m);
+  m.addEventListener('click', e => { if (e.target === m) close(m); });
+  $$('[data-close]', box).forEach(b => b.onclick = () => close(m));
+  function close(node){ node.remove(); if (onClose) onClose(); }
+  m._close = () => close(m);
+  return m;
+}
+function closeAllModals(){ $('#modalLayer').innerHTML = ''; }
+
+/* ============================================================================
+   §13.1 启动页（拟真娱乐城 splash）
+   合规声明（§13.5.1）常驻底部，不得被任何动效遮挡。
+   ============================================================================ */
+function runSplash(done){
+  const sp = $('#splash');
+  const bar = $('#spBar'), pctEl = $('#spPct');
+  const t0 = (window.performance && performance.now) ? performance.now() : Date.now();
+  let finished = false;
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    clearInterval(iv);
+    sp.style.animation = 'none';              // 关掉 CSS 兜底动画，避免与淡出叠加
+    sp.style.transition = 'opacity .3s';
+    sp.style.opacity = '0';
+    setTimeout(() => {
+      const t1 = (window.performance && performance.now) ? performance.now() : Date.now();
+      window.__splashMs = Math.round(t1 - t0);   // 供验收测量
+      sp.remove();
+      if (done) done();
+    }, 300);
+  };
+  /* §15.3：总时长（进度 + 淡出）压到 1.2 秒以内 */
+  const DUR = 700, TICK = 50;
+  let elapsed = 0;
+  const iv = setInterval(() => {
+    elapsed += TICK;
+    const p = Math.min(100, Math.round(elapsed / DUR * 100));
+    bar.style.width = p + '%';
+    pctEl.textContent = (p >= 100 ? '进入游戏…' : '加载中 ' + p + '%');
+    if (elapsed >= DUR) finish();
+  }, TICK);
+  $('#spSkip').onclick = finish;
+  sp.addEventListener('click', e => { if (e.target === sp) finish(); });
+}
+
+/* ============================================================================
+   §13.1 顶部跑马灯（假中奖播报）
+   §13.5.4：结算页必须点破这些播报的虚假性。
+   ============================================================================ */
+const MARQUEE = [
+  '<b>138****6688</b> 提现 ¥8,800 到账',
+  '<b>会员 7**22</b> 爆出 7️⃣7️⃣7️⃣ 大奖 ¥5,000',
+  '当前在线 <b>12,847</b> 人',
+  '<b>186****3391</b> 提现 ¥2,300 到账',
+  '<b>会员 3**08</b> 龙虎斗连中 9 把，盈利 ¥1,760',
+  '<b>159****7712</b> 首充 ¥500 已到账',
+  '<b>会员 9**51</b> 百家乐押和命中，返 ¥4,500',
+  '今日已派彩 <b>¥3,271,904</b>',
+  '<b>133****2204</b> 提现 ¥660 到账',
+  '<b>会员 5**17</b> 亏损返水 ¥312 已发放'
+];
+function renderMarquee(){
+  const t = $('#mqTrack'); if (!t) return;
+  const one = MARQUEE.map(x => '<span>' + x + '</span>').join('');
+  t.innerHTML = one + one;          // 复制一份实现无缝循环
+}
+
+/* ============================================================================
+   §13.1 Banner 轮播（3 张拟真广告）
+   ============================================================================ */
+const BANNERS = [
+  { ic:'🎁', tt:'首充双倍', ds:'充 ¥500 送 ¥500 彩金 · 仅限今日', go:'立即领取', c:'linear-gradient(120deg,#3a0d0d,#7a1f10)' },
+  { ic:'💸', tt:'亏损返水 5%', ds:'当日亏损次日自动返还 · 无需申请', go:'查看详情', c:'linear-gradient(120deg,#3a2408,#7a4a10)' },
+  { ic:'⚡', tt:'VIP 极速提现通道', ds:'尊贵会员专享 · 3 分钟到账', go:'开通 VIP', c:'linear-gradient(120deg,#2a1a3a,#4a2a6a)' }
+];
+let bnrIdx = 0, bnrTimer = null;
+function renderBanners(){
+  const host = $('#bnr'); if (!host) return;
+  host.innerHTML = BANNERS.map((b, i) =>
+    '<div class="sl' + (i === 0 ? ' on' : '') + '" data-i="' + i + '" style="background:' + b.c + '">' +
+      '<div class="ic">' + b.ic + '</div>' +
+      '<div><div class="tt">' + b.tt + '</div><div class="ds">' + b.ds + '</div></div>' +
+      '<div class="go">' + b.go + '</div>' +
+    '</div>').join('') +
+    '<div class="dots">' + BANNERS.map((b, i) =>
+      '<i class="' + (i === 0 ? 'on' : '') + '"></i>').join('') + '</div>';
+  $$('#bnr .sl').forEach(s => s.onclick = () => { if (frozenBlock()) return; closeAllModals(); openRecharge(); });
+  clearInterval(bnrTimer);
+  bnrTimer = setInterval(() => {
+    if (curView !== 'v-lobby') return;
+    bnrIdx = (bnrIdx + 1) % BANNERS.length;
+    $$('#bnr .sl').forEach((s, i) => s.classList.toggle('on', i === bnrIdx));
+    $$('#bnr .dots i').forEach((d, i) => d.classList.toggle('on', i === bnrIdx));
+  }, 3600);
+}
+
+/* ============================================================================
+   §13.1 悬浮客服（真实网赌话术，纯展示）
+   ============================================================================ */
+const KEFU_LINES = [
+  '亲，遇到问题了吗？加客服领取 88 元彩金～',
+  '亲，提现未到账是因为流水未达标哦，再玩几把就好啦～',
+  '亲，我们平台是正规持牌的，每天都有上万人提现成功呢～',
+  '亲，VIP5 可以享受 3 分钟极速提现通道哦，充值满 ¥5,000 即可开通～',
+  '亲，您的手气只是暂时不好，换个桌子转转运吧～'
+];
+$('#kefu').onclick = () => {
+  const line = KEFU_LINES[S.kefuN % KEFU_LINES.length];
+  S.kefuN++;
+  openModal(
+    '<h3>💬 在线客服</h3>' +
+    '<div style="display:flex;gap:10px;align-items:flex-start;margin:12px 0">' +
+      '<div style="width:36px;height:36px;border-radius:6px;flex:0 0 auto;background:linear-gradient(140deg,#e8402f,#a81f14);display:flex;align-items:center;justify-content:center;font-size:18px">🎧</div>' +
+      '<div style="background:#242424;border-radius:4px 12px 12px 12px;padding:10px 12px;font-size:13.5px;color:#e8e8e8;line-height:1.8">' +
+        line + '</div>' +
+    '</div>' +
+    '<div class="mini">客服话术与真实网赌平台一模一样。它们唯一的目的，是让你相信别人赢了、你也能赢。</div>' +
+    '<button class="btn g shine" id="kfBonus">领取 88 元彩金</button>' +
+    '<button class="btn s" data-close>关闭</button>',
+    'gamble');
+  /* §3.3-4：客服弹窗里的充值入口也要先过冻结拦截 */
+  const kb = $('#kfBonus');
+  if (kb) kb.onclick = () => { closeAllModals(); if (frozenBlock()) return; openRecharge(); };
+};
+
+/* ============================================================================
+   §13.1 VIP 等级条（反讽：VIP5 依然提不出钱）
+   ============================================================================ */
+const VIP_TIERS = [
+  { lv:1, need:100,   spd:'提现 24 小时内到账' },
+  { lv:2, need:500,   spd:'提现 12 小时内到账' },
+  { lv:3, need:1000,  spd:'提现 6 小时内到账' },
+  { lv:4, need:3000,  spd:'提现 1 小时内到账' },
+  { lv:5, need:5000,  spd:'提现 3 分钟极速到账' }
+];
+function vipLevel(){
+  let lv = 0;
+  VIP_TIERS.forEach(t => { if (S.recharged >= t.need) lv = t.lv; });
+  return lv;
+}
+function renderVip(){
+  const host = $('#vipBar'); if (!host) return;
+  const lv = vipLevel();
+  const cur = VIP_TIERS[lv - 1], nxt = VIP_TIERS[lv];
+  const prog = nxt ? clamp((S.recharged - (cur ? cur.need : 0)) / (nxt.need - (cur ? cur.need : 0)), 0, 1) : 1;
+  host.innerHTML =
+    '<span class="bg' + (lv ? '' : ' v0') + '">' + (lv ? 'VIP' + lv : '普通会员') + '</span>' +
+    '<span class="pr"><i style="width:' + (prog * 100).toFixed(1) + '%"></i></span>' +
+    '<span class="mini" style="color:#8d8d8d">' +
+      (nxt ? '再充 ' + yuan0(nxt.need - S.recharged) + ' 升级 VIP' + nxt.lv : '已是最高等级') + '</span>' +
+    '<span class="tx">' + (cur ? '承诺：' + cur.spd : '充值任意金额即可开通 VIP') + '</span>';
+}
+
+/* ============================================================================
+   §13.2 双标语系统 —— 红色煽动与冷色忠告必须同屏并置，禁止分页
+   ============================================================================ */
+const RED_SLOGANS = [
+  '秦琼卖马颜面抛，杨志也曾卖宝刀。曹操曾走华容道，仲达装扮妇人笑。英雄总有落难日，谁没低头弯过腰。',
+  '再搏一把，就差一点就回本了。',
+  '别人都能提现，你为什么不行？',
+  '今天手气不好？换个桌转转运。',
+  '输了不可怕，怕的是不敢再来。',
+  '首充双倍，最后 3 小时！',
+  '亏损返水 5%：输掉的部分，还能拿回来一点。',
+  'VIP 通道，提现极速到账，无需等待。'
+];
+let redIdx = rnd(RED_SLOGANS.length);
+function redSloganHTML(cls){
+  const s = RED_SLOGANS[redIdx % RED_SLOGANS.length];
+  return '<div class="slogan slogan-red"><div class="tx' +
+    (s.length > 30 ? ' poem' : '') + '">' + s + '</div></div>';
+}
+function nextRedSlogan(){ redIdx = (redIdx + 1) % RED_SLOGANS.length; }
+/* 冷色忠告：数值随实际游玩数据实时变化 */
+function coldSloganHTML(){
+  const lost = Math.max(0, S.totalStaked - S.totalReturned);
+  const lostTxt = lost > 0
+    ? '你已经失去：<b>' + Math.floor(lost / CONV.meal.unit) + '</b> 顿食堂饭菜 ｜ <b>' +
+      Math.floor(lost / CONV.lemon.unit) + '</b> 杯柠檬水 ｜ <b>' +
+      (Math.round(lost / CONV.wage.unit * 10) / 10) + '</b> 小时父母的工作时间'
+    : '你还没有失去什么 —— 目前为止。';
+  return '<div class="slogan slogan-cold"><div class="tx">' +
+    lostTxt + '<br>' +
+    (S.lastLossAmount >= 200 ? '刚才那 3 分钟输掉的 <b>' + yuan0(S.lastLossAmount) + '</b>，它不会回来了。<br>' : '') +
+    '上面那些话，是写来让你继续下注的。<br>' +
+    (S.recharged > 0 ? '如果这是真钱，你今天已经充了 <b>' + yuan0(S.recharged) + '</b>。' : '') +
+    '</div></div>';
+}
+function renderDual(){
+  const host = $('#dualBox'); if (!host) return;
+  /* §15.1.2：不加任何解释性标注，让红/冷的对撞自己说话 */
+  host.innerHTML = redSloganHTML() + coldSloganHTML();
+}
+/* §15.2 冷色忠告：默认收起，点顶栏 👁 才展开；展开状态存 localStorage。
+   沉浸区里不出现任何常驻忠告文字——常驻的提醒 = 无效的说教。 */
+let coldOpen = Store.get('jdc_cold', false);
+function renderColdBar(){
+  const host = $('#coldBar'); if (!host || !coldOpen) return;
+  const lost = Math.max(0, S.totalStaked - S.totalReturned);
+  if (lost <= 0 && S.recharged <= 0){
+    host.innerHTML = '你还没有输掉任何东西。这句话很快就不成立了。';
+    return;
+  }
+  host.innerHTML = '你已经失去 <b>' + Math.floor(lost / CONV.meal.unit) + '</b> 顿食堂饭菜 ｜ <b>' +
+    Math.floor(lost / CONV.lemon.unit) + '</b> 杯柠檬水 ｜ <b>' +
+    (Math.round(lost / CONV.wage.unit * 10) / 10) + '</b> 小时父母的工作时间' +
+    (S.recharged > 0 ? '　·　今日已充值 <b>' + yuan0(S.recharged) + '</b>' : '');
+}
+function applyCold(){
+  const bar = $('#coldBar'), eye = $('#eyeCold');
+  if (!bar || !eye) return;
+  bar.classList.toggle('hide', !coldOpen);
+  eye.classList.toggle('on', coldOpen);
+  eye.title = coldOpen ? '收起账目' : '看看账目';
+  if (coldOpen) renderColdBar();
+}
+
+/* ============================================================================
+   §13.1 拟真动效：金币雨 + WebAudio 合成筹码声（不得引入外部音频文件）
+   ============================================================================ */
+let AC = null;
+function chipSound(freq){
+  try {
+    if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+    if (AC.state === 'suspended') AC.resume();
+    const t = AC.currentTime;
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(freq || 1750, t);
+    o.frequency.exponentialRampToValueAtTime((freq || 1750) * 0.55, t + 0.055);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.14, t + 0.004);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.10);
+    o.connect(g); g.connect(AC.destination);
+    o.start(t); o.stop(t + 0.11);
+  } catch (e) { /* 无音频环境时静默 */ }
+}
+function coinRain(n, x){
+  try {
+    const W = window.innerWidth;
+    for (let i = 0; i < (n || 14); i++){
+      const c = el('div', 'coin', '🪙');
+      c.style.left = (x != null ? x + (Math.random() * 120 - 60) : rnd(W)) + 'px';
+      c.style.top = '-20px';
+      c.style.animationDelay = (Math.random() * 0.45).toFixed(2) + 's';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 2500);
+    }
+  } catch (e) {}
+}
+/* 赌桌拟真道具：真人荷官占位框 + 筹码堆 */
+function dealerHTML(name){
+  return '<div class="dealer">' +
+    '<div class="cam"><div class="ld">视频加载中…</div></div>' +
+    '<div class="tx">真人荷官 · ' + name + '<br><span style="color:#4f6a5c">高清视频流（模拟占位）</span></div>' +
+    '<div class="rec">LIVE</div>' +
+    '</div>' +
+    '<div class="chipstack"><i></i><i></i><i></i><i></i><i></i></div>';
+}
+
+/* ============================================================================
+   §3.2 虚拟充值 + 失去提醒
+   ============================================================================ */
+const TIERS = [
+  { amt:100,  tag:'新手体验金，先试试手气', gift:0 },
+  { amt:500,  tag:'今日首充 100% 赠送！',   gift:500 },
+  { amt:1000, tag:'VIP 通道，提现极速到账', gift:0 },
+  { amt:5000, tag:'救场金：翻本就在今晚',   gift:0 }
+];
+
+function openRecharge(){
+  if (frozenBlock()) return;      // §3.3-4 冻结后所有充值入口先过冻结拦截
+  nextRedSlogan();
+  const html =
+    /* §13.2 上半部：红色煽动 */
+    redSloganHTML() +
+    (S.loseStreak >= 3
+      ? '<div class="allin-tip" style="margin:2px 0 8px">🔥 一把回本，就差这一把' +
+        '<b>（连输 ' + S.loseStreak + ' 局了）</b></div>' : '') +
+    '<h3>💳 快速充值</h3>' +
+    '<div class="mini" style="color:#c98a80">选择充值金额，秒到账，随时可提现</div>' +
+    '<div class="tiers">' +
+      TIERS.map(t =>
+        '<div class="tier" data-amt="' + t.amt + '">' +
+          '<div class="amt">¥' + t.amt.toLocaleString() + '</div>' +
+          '<div class="tag">' + t.tag + '</div>' +
+          (t.gift ? '<div class="gift">送 ¥' + t.gift + ' 彩金</div>' : '') +
+        '</div>').join('') +
+    '</div>' +
+    '<button class="btn g shine" id="tierGo">立即领取</button>' +
+    /* §13.4 亏损返水（可展开） */
+    '<button class="btn s" id="refundToggle" style="margin-top:9px">💸 当日亏损返水 5%（次日自动到账）</button>' +
+    '<div id="refundBox" class="hide" style="margin-top:9px"></div>' +
+    '<button class="btn s" data-close>再想想</button>' +
+    /* §13.2 下半部：冷色忠告（与上半部红色标语同屏对撞） */
+    coldSloganHTML() +
+    '<div class="bonus-rule">' +
+      '· 彩金不可提现，下注时优先扣除彩金<br>' +
+      '· 提现需完成充值额 20 倍的有效投注流水<br>' +
+      '· 返水金额只能继续下注，不可提现<br>' +
+      '· 本软件为反赌教育演示，所有金额均为虚拟数字（模拟），不涉及任何真实支付' +
+    '</div>';
+  const m = openModal(html, 'gamble');
+  const box = $('.box', m);
+  /* §17.2 输光后默认高亮档位自动跳到上一档（"救场金：翻本就在今晚"） */
+  let sel = 500;
+  if (wallet() < MIN_BET && S.lastTier){
+    const i = TIERS.findIndex(t => t.amt === S.lastTier);
+    sel = TIERS[i < 0 ? 1 : Math.min(TIERS.length - 1, i + 1)].amt;
+  }
+  $$('.tier', box).forEach(t => {
+    t.classList.toggle('sel', +t.dataset.amt === sel);
+    t.onclick = () => { sel = +t.dataset.amt; $$('.tier', box).forEach(x => x.classList.remove('sel')); t.classList.add('sel'); };
+  });
+  $('#tierGo', box).onclick = () => { m._close(); confirmRecharge(sel); };
+  $('#refundToggle', box).onclick = () => {
+    const rb = $('#refundBox', box);
+    rb.classList.toggle('hide');
+    if (!rb.innerHTML){
+      rb.innerHTML =
+        '<div class="note" style="background:#0d1317;border:1px solid #24404d;border-radius:9px;' +
+        'padding:10px;font-size:12px;color:#8fc7dd;line-height:1.85">' +
+          '<b style="color:#d6eef8">返水不是福利，是优势的重新包装。</b><br><br>' +
+          '以老虎机为例：庄家优势 <b>8%</b>，返水 5% 后仍为<br>' +
+          '<span class="mono" style="color:#d6eef8">8% × 0.95 ≈ 7.6%</span><br>' +
+          '你依然在稳定亏损，只是亏得慢了一点点。<br><br>' +
+          '而且返水只能继续下注、不能提现——<br>' +
+          '<b style="color:#ff8a72">它唯一的作用，是让你别走。</b>' +
+        '</div>';
+    }
+  };
+}
+
+/* 失去提醒：每次充值必须弹出，不可跳过 */
+function confirmRecharge(amt){
+  const meal   = Math.floor(amt / CONV.meal.unit);
+  const lemon  = Math.floor(amt / CONV.lemon.unit);
+  const phone  = (amt / CONV.phone.unit);
+  const hours  = (amt / CONV.wage.unit);
+  const html =
+    '<h3>确认充值</h3>' +
+    '<div style="font-size:15px;color:#e8dcc8;margin:10px 0">你即将充值 <b style="color:#ff8a72;font-family:var(--mono);font-size:20px">' +
+      yuan0(amt) + '</b>（虚拟）。</div>' +
+    '<div style="font-size:13.5px;color:#c9bda0">如果这是真钱，它等于：</div>' +
+    '<ul class="alert-list">' +
+      '<li>你在学校食堂吃 <b>' + meal + '</b> 顿饭（一个月的午饭）</li>' +
+      '<li><b>' + lemon + '</b> 杯蜜雪冰城柠檬水</li>' +
+      '<li>一个月的手机话费 ×<b>' + (Math.round(phone * 10) / 10) + '</b></li>' +
+      '<li>你父母要工作 <b>' + hours + '</b> 个小时才能赚到（按时薪 ¥20 计算）</li>' +
+    '</ul>' +
+    '<div class="mini">换算基准：食堂一顿 ¥15 ｜ 柠檬水 ¥4 ｜ 话费 ¥50/月 ｜ 父母时薪 ¥20 ｜ ' +
+      '一个月生活费 ¥1,500 ｜ 一学年学费+住宿 ¥8,000 ｜ 一双跑鞋 ¥500 ｜ 一部手机 ¥4,500</div>' +
+    '<button class="btn g shine" id="doRecharge">确认充值</button>' +
+    '<button class="btn s" data-close id="noThanks">我不想失去这些</button>';
+  const m = openModal(html, 'gamble');
+  $('#noThanks', m).onclick = () => { m._close(); };
+  $('#doRecharge', m).onclick = () => { m._close(); doRecharge(amt); };
+}
+
+function doRecharge(amt){
+  S.lastTier = amt;
+  S.recharged += amt;            // 只计真实充值额，彩金不计入
+  S.rechargeCount++;             // 真实充值次数（离开赌场时记为沉没成本）
+  S.balance += amt;
+  let gift = 0;
+  if (amt === 500 && !S.bonusGiven){ gift = 500; S.bonus += gift; S.bonusGiven = true; }
+  S.bankruptDeclared = false;    // 有钱了，破产状态解除
+  saveBoard(); save(); refreshTopbar(); renderLobby();
+  openModal(
+    '<h3 style="color:#ff6a55">✅ 充值成功</h3>' +
+    '<div class="note" style="font-size:14px;color:#d8d0c0">' +
+      '到账 <b style="color:#ff8a72">' + yuan0(amt) + '</b>' +
+      (gift ? '，另赠送彩金 <b style="color:#ffb84d">' + yuan0(gift) + '</b>（不可提现，下注优先扣除）' : '') +
+      '。<br>今日累计充值：<b style="color:#ff8a72">' + yuan0(S.recharged) + '</b>' +
+      '<br>当前余额：<b style="color:#d4af37">' + yuan0(S.balance) + '</b>' +
+      (S.bonus > 0 ? ' ＋ 彩金 ' + yuan0(S.bonus) : '') +
+    '</div>' +
+    '<button class="btn p" data-close>继续游戏</button>'
+  );
+}
+
+/* ============================================================================
+   §13.3 提现剧本（三阶段）
+   阶段 1 甜头 → 阶段 2 永远差一点 → 阶段 3 彩蛋：赢了也拿不走
+   ============================================================================ */
+const WD_LINES = [
+  '提现审核中（预计 72 小时）',
+  '风控审核：账户异常，请联系客服',
+  '系统维护中，请稍后再试',
+  '您的账户存在异常投注行为，已提交人工复核',
+  '提现通道拥堵，当前排队人数 2,317 人'
+];
+/* 提现流水进度（阶段 2 的进度条与"差一点"钩子都用它） */
+function withdrawProgress(){
+  const need = S.recharged * 20;
+  if (need <= 0) return 0;
+  return clamp(S.totalBetVolume / need, 0, 1);
+}
+
+function openWithdraw(){
+  if (S.frozen){ showFrozen(true); return; }
+
+  /* —— 第 0 步：从没充过钱。体验金不可提现（网赌标配），先挡住。
+     必须在冻结判定之前：否则一个从没充值的玩家（初始余额 ¥1,000）
+     点两次提现就有 10% 概率被冻结，演示开场就废。 —— */
+  if (S.recharged <= 0){
+    closeAllModals();
+    openModal(
+      '<h3>💸 提现</h3>' +
+      '<div class="note" style="color:#e8b4ac;font-size:14px;line-height:2">' +
+        '体验金不可提现。<br>充值后即可解锁提现通道。' +
+      '</div>' +
+      '<div class="mini">您的 ¥' + Math.round(S.balance) + ' 为平台赠送的体验金，' +
+        '仅可用于下注，不可提现、不可转赠。</div>' +
+      '<button class="btn g shine" id="wdGo">去充值解锁提现</button>' +
+      '<button class="btn s" data-close>关闭</button>', 'gamble');
+    const g0 = $('#wdGo');
+    if (g0) g0.onclick = () => { closeAllModals(); openRecharge(); };
+    return;
+  }
+
+  const need = S.recharged * 20;
+  const prog = withdrawProgress();
+
+  /* —— 阶段 3：彩蛋。按账户金额一次判定，与点击次数无关（仅限真实充值过的账户）。
+     §18.3：门槛由账号标签决定——10% 的"重点关照"账号门槛减半，
+     原来的"余额 ≥¥500 时每次点击 10% 随机"已作废。
+     §3.3-3：达到冻结门槛时先判冻结——充值达门槛后第一次点提现就冻结
+     （原规格书 §18.7.4 晚于 §13.3，以晚的为准），所以本判定放在阶段 1 甜头之前。 —— */
+  const th = freezeThreshold();
+  if (S.recharged > 0 && (S.recharged >= th.recharge || S.balance >= th.balance)){
+    closeAllModals(); triggerFrozen(); return;
+  }
+
+  /* —— 阶段 1：甜头（仅一次）。先让你相信"这平台真能提现" —— */
+  if (S.wdStage === 0 && S.balance >= 300){
+    S.wdStage = 1;
+    S.balance = Math.max(0, S.balance - 50);
+    save(); refreshTopbar(); renderLobby();
+    coinRain(16);
+    openModal(
+      '<h3 style="color:#27ae60">✅ 提现成功</h3>' +
+      '<div class="note" style="color:#d8d0c0;font-size:14px;line-height:2">' +
+        '<b style="color:#7ee2a8;font-family:var(--mono);font-size:20px">¥50</b> 已到账（模拟）' +
+      '</div>' +
+      '<div class="mini">到账时间：3 分钟　｜　手续费：¥0　｜　通道：银联快捷</div>' +
+      '<div class="hr"></div>' +
+      '<div class="note" style="color:#e8dcc8;font-size:13.5px;line-height:1.95">' +
+        '提升提现额度需完成<b style="color:#ff8a72">流水任务</b>：<br>' +
+        '累计充值 ¥' + S.recharged.toLocaleString() + ' × 20 = 需完成 <b style="color:#ff8a72">' +
+        yuan0(need) + '</b> 有效投注。' +
+      '</div>' +
+      '<button class="btn p" data-close>继续游戏</button>', 'gamble');
+    return;
+  }
+
+  /* —— 阶段 2：永远差一点 —— */
+  let html;
+  if (prog < 1){
+    const left = Math.max(0, need - S.totalBetVolume);
+    const hot = prog >= 0.70;
+    html = '<h3>💸 提现失败</h3>' +
+      '<div class="note" style="color:#e8b4ac;font-size:14px;line-height:2">' +
+        '流水未达标。您还需完成 <b style="color:#ff8a72;font-family:var(--mono);font-size:18px">' +
+        yuan0(left) + '</b> 的有效投注方可提现。' +
+      '</div>' +
+      '<div class="wdbar' + (hot ? ' hot' : '') + '"><i style="width:' + (prog * 100).toFixed(1) + '%"></i></div>' +
+      '<div class="mini" style="text-align:center">提现进度 <b style="color:' + (hot ? '#f6e27a' : '#e8402f') +
+        ';font-size:14px">' + (prog * 100).toFixed(1) + '%</b>' +
+        (hot ? '　<span style="color:#f6e27a">就差一点了，再来几把！</span>' : '') + '</div>' +
+      '<div class="mini" style="margin-top:8px">有效投注 = 充值额 × 20。已充值 <b>' + yuan0(S.recharged) +
+        '</b>，需要流水 <b>' + yuan0(need) + '</b>，当前累计有效投注 <b>' + yuan0(S.totalBetVolume) + '</b>。<br>' +
+        '注意：输光的钱不算完成流水，流水只增不减。</div>' +
+      (hot ? redSloganHTML() : '') +
+      '<button class="btn g shine" id="wdGo">继续下注完成流水</button>' +
+      '<button class="btn s" data-close>不玩了</button>';
+  } else {
+    html = '<h3>💸 提现</h3>' +
+      '<div class="note" style="color:#e8b4ac;font-size:14px">' + WD_LINES[S.withdrawStage % WD_LINES.length] + '</div>' +
+      '<div class="mini">您的提现申请已受理，请耐心等待。客服微聊：' +
+        '<span style="color:#5f5f5f">kf_8888（该账号不存在）</span></div>' +
+      '<button class="btn s" data-close>好的</button>';
+    S.withdrawStage++;
+  }
+  const m = openModal(html, 'gamble');
+  const g = $('#wdGo', m);
+  if (g) g.onclick = () => { m._close(); openRecharge(); };
+}
+
+/* —— 阶段 3：账户冻结页（本软件唯一的法律爆点，法条只允许出现在这里） —— */
+function triggerFrozen(){
+  S.frozen = true;
+  save();
+  showFrozen(false);
+  renderFrozenBar();
+}
+function showFrozen(already){
+  const f = $('#frozen');
+  f.classList.remove('hide');
+  f.innerHTML =
+    '<div class="in">' +
+      '<div class="stamp"><span>账 户 冻 结</span></div>' +
+      '<h2>账户已被冻结</h2>' +
+      '<p style="text-align:center">经风控核查，您账户接收的资金来源于境外电信网络诈骗案件，' +
+        '已被公安机关依法冻结（模拟）。</p>' +
+
+      '<h3>② 为什么？网赌平台的钱，是从哪来的？</h3>' +
+      '<div class="why">' +
+        '<p>网赌平台的钱从哪来？——从境外来，是电信诈骗骗来的赃款。</p>' +
+        '<p>平台让你"赢"、让你"提现"，本质是让你用自己的银行卡，把这笔赃款洗一遍。</p>' +
+        '<p><b>你以为你在赌博，其实你在替他们洗钱。</b></p>' +
+      '</div>' +
+
+      '<h3>③ 后果清单</h3>' +
+      '<ol>' +
+        '<li>银行卡被司法冻结，需自行向公安机关说明资金来源</li>' +
+        '<li>依"断卡行动"（银发〔2019〕85 号）：<b>5 年内暂停银行账户非柜面业务、支付账户所有业务，' +
+          '且不得新开户</b>——手机银行、网上银行、ATM、支付宝、微信支付全部停用，只能到柜台办业务</li>' +
+        '<li>相关信息移送金融信用信息基础数据库并向社会公布，影响贷款、信用卡申请</li>' +
+        '<li>影响考公、参军、入党等政审环节；学校可依《学生违纪处分办法》给予记过以上直至开除学籍处分</li>' +
+      '</ol>' +
+
+      '<h3>④ 可能的法律定性</h3>' +
+      '<div class="law">' +
+        '<p>· 若查明你明知是犯罪所得仍予接收、转移，可能构成《刑法》<b>第三百一十二条</b>' +
+          '掩饰、隐瞒犯罪所得、犯罪所得收益罪（三年以下；情节严重的，三年以上七年以下）。</p>' +
+        '<p>· 若你曾出借银行卡、收款码或帮人转账（"跑分"），可能构成《刑法》' +
+          '<b>第二百八十七条之二</b>帮助信息网络犯罪活动罪（三年以下）。</p>' +
+        '<p>· 参与赌博赌资较大的，另依《治安管理处罚法》<b>第八十二条</b>处拘留、罚款。</p>' +
+      '</div>' +
+
+      '<div class="punch">这就是网赌里"赢"的真相——你赢到的钱，是别人被骗的钱；' +
+        '而你的银行卡，是这条链路的最后一环。</div>' +
+      '<div class="fine">本页情节、金额与冻结通知均为反赌教育模拟，不涉及任何真实账户、资金或执法行为。<br>' +
+        '法条仅作普法提示，具体定性以司法机关认定为准。</div>' +
+      '<button class="btn p" id="frozenGo">进入结算页 ›</button>' +
+      '<button class="btn s" style="width:100%;padding:13px;font-size:14px" id="frozenLeave">离开赌场，看骗子的剧本</button>' +
+    '</div>';
+  $('#frozenGo').onclick = () => {
+    f.classList.add('hide');
+    go('v-bill');
+  };
+  /* §3.1-3：冻结页同样能直接回主页看剧本 */
+  $('#frozenLeave').onclick = leaveCasino;
+}
+function renderFrozenBar(){
+  const b = $('#frozenBar');
+  if (!S.frozen){ b.classList.add('hide'); return; }
+  b.classList.remove('hide');
+  b.innerHTML = '🧊 您的账户已被冻结（模拟）—— 只能查看结算页　' +
+    '<span style="color:#c98a80;font-weight:400">这就是网赌里"赢"的结局</span>';
+}
+/* 冻结后拦截一切下注入口 */
+function frozenBlock(){
+  if (!S.frozen) return false;
+  openModal(
+    '<h3 style="color:#e8402f">🧊 账户已冻结</h3>' +
+    '<div class="note" style="color:#d8d0c0;font-size:14px;line-height:1.95">' +
+      '您的账户已被公安机关依法冻结（模拟），无法继续下注。<br>' +
+      '这就是网赌里"赢了钱"的真实结局。</div>' +
+    '<button class="btn p" id="fbGo">查看结算页</button>' +
+    '<button class="btn s" data-close>关闭</button>'
+  );
+  const g = $('#fbGo');
+  if (g) g.onclick = () => { closeAllModals(); go('v-bill'); };
+  return true;
+}
+
+/* ============================================================================
+   §3.2 离开赌场：把这一局按原 S 状态算成主页能认的记录，跳回主页
+   主页 core 的 #/ext?r=… 会校验 mod、写 RJ.record，再跳该结局页。
+   ============================================================================ */
+function leaveCasino(){
+  const ending = S.frozen ? 'e_x'
+    : S.recharged > 0 ? 'e_c'
+    : S.totalStaked > 0 ? (S.balance >= 1000 ? 'e_a' : 'e_b')
+    : 'e_s';
+  const grade = { e_s:'S', e_a:'A', e_b:'B', e_c:'C', e_x:'X' }[ending];
+  const run = {
+    mod: 'wangdu', ending: ending, grade: grade,
+    loss: S.recharged,                 // 只计真实充值，体验金不算
+    dirty: 0,
+    hooks: {
+      greed: S.totalStaked > 0 ? 1 : 0,
+      sunk: S.rechargeCount,
+      fear: S.frozen ? 1 : 0
+    },
+    leftAt: S.frozen ? 'lock' : S.recharged > 0 ? 'harvest' : S.totalStaked > 0 ? 'hook' : 'lure',
+    path: [], picks: [], ts: Date.now(), secs: S.seconds
+  };
+  location.href = '../../index.html#/ext?r=' + encodeURIComponent(JSON.stringify(run));
+}
+
+/* ============================================================================
+   §3.2 实时损失提醒横幅
+   ============================================================================ */
+let bannerTimer = null;
+function showLossBanner(amount){
+  const pool = [
+    '刚才 3 分钟，你输掉了一周的早餐钱（¥30×10）',
+    '这把输的 ' + yuan0(amount) + '，够你买双跑鞋，现在它进了庄家的口袋',
+    '你已经输了 ' + yuan0(S.totalStaked - S.totalReturned) + '，这是你父母 ' +
+      Math.round((S.totalStaked - S.totalReturned) / CONV.wage.unit) + ' 个小时的工资'
+  ];
+  const t = $('#bannerT');
+  t.textContent = pool[rnd(pool.length)];
+  const b = $('#banner');
+  b.classList.add('on');
+  clearTimeout(bannerTimer);
+  bannerTimer = setTimeout(() => b.classList.remove('on'), 6500);
+}
+$('#bannerX').onclick = () => $('#banner').classList.remove('on');
+
+/* ============================================================================
+   §3.4 + §16 后台调参层（v1.4 改为账号级）
+   · 养鱼期 = 累计净盈利 < ¥500 且 总局数 ≤ 20（任一超出即结束）
+   · 杀猪期是账号级状态，全部 7 桌生效——风控跟着账号走，不跟着桌子走
+   · §13.3 阶段 2 的"差一点"钩子在此叠加 ×0.85
+   ============================================================================ */
+const PUBLIC_PROB = {
+  dice:    { label:'押大/押小',  p:105/216 },
+  ssc:     { label:'押大/押小',  p:0.5 },
+  bac:     { label:'押庄',       p:0.4586 },
+  slot:    { label:'返还率 RTP', p:0.92 },
+  sport:   { label:'押主胜',     p:0.5050 },
+  dragon:  { label:'押龙/押虎',  p:192/415 },
+  redpack: { label:'不中雷',     p:0.9 }
+};
+const CHEAT = (() => {
+  const st = { rounds:0, fishEnded:false, endNote:'', log:[] };
+  function endFish(reason){
+    if (st.fishEnded) return;
+    st.fishEnded = true; st.endNote = reason;
+    st.log.push({ t:Date.now(), n:st.rounds, mark:'养鱼期结束 · ' + reason });
+  }
+  function isFish(){
+    if (st.fishEnded) return false;
+    const f = acctFate();
+    if (S.totalReturned - S.totalStaked >= f.fishQuota){
+      endFish('累计喂养 ¥' + f.fishQuota); return false;
+    }
+    if (st.rounds >= FISH_MAX_ROUNDS){ endFish(FISH_MAX_ROUNDS + ' 局用尽'); return false; }
+    return true;
+  }
+  const hookOn = () => withdrawProgress() >= 0.70;
+  /* 只读版本：供展示用，不推进任何状态 */
+  function currentMult(){
+    const f = acctFate();
+    const fish = !st.fishEnded && (S.totalReturned - S.totalStaked < f.fishQuota)
+                 && (st.rounds < FISH_MAX_ROUNDS);
+    let m = fish ? f.fishMult : f.killMult;
+    if (hookOn()) m *= 0.85;
+    return m;
+  }
+  return {
+    st: st,
+    reset(){ st.rounds = 0; st.fishEnded = false; st.endNote = ''; st.log = []; },
+    phase(){ return st.fishEnded ? '杀猪期' : '养鱼期'; },
+    rounds(){ return st.rounds; },
+    currentMult: currentMult,
+    lastWasFish(){ const l = st.log[st.log.length - 1]; return !!(l && l.fish); },
+    /* 登记一局，返回本局"你的真实胜率" */
+    rate(tid, baseRate){
+      const f = acctFate();
+      const fish = isFish();
+      st.rounds++;
+      const baseMult = fish ? f.fishMult : f.killMult;
+      const hook = hookOn();
+      const eff = baseMult * (hook ? 0.85 : 1);
+      const applied = clamp(baseRate * eff, 0.005, 0.97);
+      st.log.push({ t:Date.now(), n:st.rounds, tid:tid, base:baseRate, mult:baseMult,
+        hook:hook, eff:eff, r:applied, fish:fish });
+      if (st.log.length > 600) st.log.shift();
+      return applied;
+    },
+    save(){ return { rounds:st.rounds, fishEnded:st.fishEnded, endNote:st.endNote,
+      log:st.log.slice(-120) }; },
+    load(d){ try { if (d){ st.rounds = d.rounds || 0; st.fishEnded = !!d.fishEnded;
+      st.endNote = d.endNote || ''; st.log = d.log || []; } } catch (e) {} }
+  };
+})();
+
+function openWrench(){
+  const st = CHEAT.st;
+  const html =
+    '<h3 style="color:#ff6a55">🔧 后台管理 · 平台调参记录</h3>' +
+    '<div class="mini" style="color:#8a8a8a">（平时不可见。演示时由讲解者点开）</div>' +
+    '<div id="cheatBody" style="margin-top:12px"></div>' +
+    '<button class="btn s" data-close>关闭后台</button>';
+  const m = openModal(html, 'gamble');
+  const body = $('#cheatBody', m);
+  if (!st.rounds && !st.fishEnded){
+    body.innerHTML = '<div class="note" style="color:#c98a80">暂无调参记录。' +
+      '随便玩几局（哪一桌都行），后台就会开始记录。</div>';
+    return;
+  }
+  const mlt = CHEAT.currentMult();
+  const fish = CHEAT.phase() === '养鱼期';
+  const f = acctFate(), th2 = freezeThreshold();
+  /* —— §16.2 公开概率 vs 你的真实胜率（覆盖全部 7 桌） —— */
+  const rows = Object.keys(PUBLIC_PROB).map(k => {
+    const pp = PUBLIC_PROB[k];
+    const real = clamp(pp.p * mlt, 0.005, 0.97);
+    return '<tr><td>' + T[k].icon + ' ' + T[k].short + '</td><td>' + pp.label + '</td>' +
+      '<td style="font-family:var(--mono)">' + pct(pp.p) + '</td>' +
+      '<td style="font-family:var(--mono);color:#e74c3c">' + pct(real) + '</td>' +
+      '<td style="font-family:var(--mono);color:#e74c3c">' + ((real - pp.p) >= 0 ? '＋' : '−') + (Math.abs(real - pp.p) * 100).toFixed(2) + 'pp</td></tr>';
+  }).join('');
+  /* §18.4 本账号档案——新的教学爆点：平台后台里，你的账号是有标签的 */
+  const acctBlock =
+    '<div style="background:#12100a;border:1px solid #3a2f18;border-radius:9px;' +
+      'padding:11px 12px;margin-bottom:14px">' +
+      '<div style="font-size:13px;color:#e8c86a;font-weight:700;margin-bottom:7px">' +
+        '📇 本账号档案</div>' +
+      '<div class="mini" style="font-family:var(--mono);line-height:2;color:#c9bda0">' +
+        '账号编号　<b style="color:#f6e27a">' + f.id + '</b>　（' + f.nick + '）<br>' +
+        '账号标签　' + (f.watch
+          ? '<b style="color:#ff8a72">重点关照 ⚑</b>'
+          : '<span style="color:#8d8d8d">普通账号</span>') + '<br>' +
+        '养鱼期　　额度 ¥' + f.fishQuota + ' ｜ 倍率 ' + f.fishMult.toFixed(2) +
+          '　（' + (st.fishEnded ? '已结束 · ' + st.endNote : '进行中 · 已 ' + st.rounds + ' 局') + '）<br>' +
+        '杀猪期　　倍率 ' + f.killMult.toFixed(2) + '<br>' +
+        '提现门槛　充值 ≥¥' + th2.recharge.toLocaleString() +
+          ' 或 余额 ≥¥' + th2.balance.toLocaleString() +
+      '</div>' +
+      '<div class="mini" style="margin-top:7px;color:#8a7a5a;line-height:1.7">' +
+        '这些参数由账号昵称的哈希算出——同一昵称在任何设备上完全一致。' +
+        (f.watch ? '　<b style="color:#ff8a72">你被选中了。</b>' : '') +
+      '</div>' +
+    '</div>';
+
+  body.innerHTML =
+    acctBlock +
+    '<div style="font-size:13px;color:#e8c86a;margin-bottom:6px">' +
+      '账号级状态 · 已记录 <b>' + st.rounds + '</b> 局 · 当前阶段：<b style="color:' +
+      (fish ? '#27ae60' : '#e74c3c') + '">' + CHEAT.phase() + '</b>' +
+      (st.fishEnded ? '　<span class="mini">（' + st.endNote + '）</span>' : '') + '</div>' +
+    '<canvas class="cheatCv" width="380" height="150" ' +
+      'style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a"></canvas>' +
+    '<div class="mini" style="margin-top:5px">纵轴 = 后台给你的真实倍率（' +
+      f.fishMult.toFixed(2) + ' 养鱼 / ' + f.killMult.toFixed(2) + ' 杀猪）</div>' +
+
+    '<div class="mini" style="color:#c9bda0;margin:16px 0 5px">' +
+      '<b>公开概率 vs 你的真实胜率</b>　—— 风控跟着账号走，换桌没用</div>' +
+    '<table class="tbl" style="font-size:11.5px">' +
+      '<tr><th>赌桌</th><th>玩法</th><th>公开概率</th><th>你的真实胜率</th><th>差距</th></tr>' +
+      rows + '</table>' +
+
+    '<div class="mini" style="margin-top:8px;font-family:var(--mono);max-height:96px;overflow:auto;' +
+      'color:#9a9a9a">' +
+      st.log.slice(-8).map(l => l.mark
+        ? '<b style="color:#e74c3c">' + timeStr(l.t) + '  ' + l.mark + '</b>'
+        : timeStr(l.t) + '  第' + l.n + '局 ' + (T[l.tid] ? T[l.tid].short : '') +
+          '  公开 ' + pct(l.base, 1) + ' × ' + l.mult.toFixed(2) +
+          (l.hook ? ' × 0.85' : '') + ' → <b style="color:' +
+          (l.fish ? '#27ae60' : '#e74c3c') + '">' + pct(l.r, 1) + '</b>' +
+          (l.hook ? '  <b style="color:#f6e27a">← 差一点</b>' : '')).join('<br>') +
+    '</div>' +
+
+    (withdrawProgress() >= 0.70
+      ? '<div class="note" style="color:#f6e27a;border-top:1px solid #3a2f18;padding-top:10px;' +
+        'line-height:1.9">⚑ 提现进度已达 <b>' + (withdrawProgress() * 100).toFixed(1) +
+        '%</b>，后台已启用 <b>"差一点"钩子</b>：全桌真实胜率再 ×0.85。<br>' +
+        '<span class="mini">进度条会在 70%–95% 之间反复徘徊——你永远"就差一点"。</span></div>'
+      : '') +
+    '<div class="note" style="color:#e8dcc8;border-top:1px solid #3a1a1a;padding-top:12px;line-height:1.95">' +
+      '你以为你在赌运气，其实对面在调参数。<br>' +
+      '养鱼期真实胜率 = 公开胜率 ×' + f.fishMult.toFixed(2) + '（新人养鱼期，让你赢）；' +
+      '一旦你累计赢满 ¥' + f.fishQuota + '，或玩满 ' + FISH_MAX_ROUNDS +
+      ' 局，立刻切到 ×' + f.killMult.toFixed(2) + '（杀猪期）。<br>' +
+      '<b style="color:#ff8a72">而且这个参数挂在你的账号上，不挂在桌子上——换桌一样被杀。</b><br>' +
+      '真实网赌平台的后台，比你想象的更简单粗暴。' +
+    '</div>';
+  drawCheatCurve($('.cheatCv', m), st.log);
+}
+function timeStr(t){ const d = new Date(t);
+  return ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2) + ':' + ('0'+d.getSeconds()).slice(-2); }
+
+function drawCheatCurve(cv, log){
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height, pad = 24;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0, 0, W, H);
+  const pts = log.filter(l => !l.mark);
+  if (pts.length < 2){
+    ctx.fillStyle = '#5a5a5a'; ctx.font = '11px monospace';
+    ctx.fillText('数据太少 —— 多玩几局，这里会画出后台给你的真实倍率曲线', 16, H / 2);
+    return;
+  }
+  /* 网格 */
+  ctx.strokeStyle = '#1e1e1e'; ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++){ const y = pad + (H - pad*2) * i / 4;
+    ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W - 6, y); ctx.stroke(); }
+  const X = i => pad + (W - pad - 8) * (pts.length <= 1 ? 0 : i / (pts.length - 1));
+  const Y = v => H - pad - (H - pad*2) * clamp(v / 1.4, 0, 1);
+  /* 1.0 基准线 */
+  ctx.setLineDash([3, 3]); ctx.strokeStyle = '#3a3a3a';
+  ctx.beginPath(); ctx.moveTo(pad, Y(1)); ctx.lineTo(W - 8, Y(1)); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#5a5a5a'; ctx.font = '9px monospace';
+  ctx.fillText('1.00 公平线', pad + 3, Y(1) - 3);
+  /* 曲线 */
+  ctx.lineWidth = 2; ctx.lineJoin = 'round';
+  for (let i = 1; i < pts.length; i++){
+    ctx.strokeStyle = pts[i].fish ? '#27ae60' : '#e74c3c';
+    ctx.beginPath(); ctx.moveTo(X(i-1), Y(pts[i-1].eff)); ctx.lineTo(X(i), Y(pts[i].eff)); ctx.stroke();
+  }
+  /* 养鱼期结束分界 */
+  const cut = pts.findIndex(l => !l.fish);
+  if (cut > 0){
+    ctx.strokeStyle = '#d4af37'; ctx.setLineDash([4,4]); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(X(cut), pad - 6); ctx.lineTo(X(cut), H - pad); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#d4af37'; ctx.font = '10px monospace';
+    ctx.fillText('第' + pts[cut].n + '局 · 开始杀猪', X(cut) + 3, pad + 4);
+  }
+  ctx.fillStyle = '#6a6a6a'; ctx.font = '10px monospace';
+  ctx.fillText('真实倍率', 2, 12);
+  ctx.fillText('局数 →', W - 46, H - 8);
+}
+$('#btnWrench').onclick = openWrench;
+
+/* ============================================================================
+   §3.5 庄家视角
+   ============================================================================ */
+const DAILY_VOLUME = { dice:2.4e6, ssc:1.8e7, bac:9.6e6, slot:3.2e6, sport:2.6e7, dragon:4.1e6, redpack:6.3e6 };
+const ONLINE = { dice:3400, ssc:8800, bac:5200, slot:15000, sport:26000, dragon:4100, redpack:6300 };
+let gmTid = null, gmTimer = null;
+
+function openGmPanel(tid){
+  gmTid = tid;
+  const p = $('#gmPanel');
+  p.classList.remove('hide');
+  renderGmPanel();
+  clearInterval(gmTimer);
+  gmTimer = setInterval(renderGmPanel, 900);
+}
+function closeGmPanel(){ $('#gmPanel').classList.add('hide'); clearInterval(gmTimer); gmTid = null; }
+
+function renderGmPanel(){
+  if (!gmTid) return;
+  const t = T[gmTid];
+  /* "本桌今日"= 平台整天的流水：按当前时刻推进（真实网赌后台就是这个口径），
+     再叠加本次会话自己的贡献。 */
+  const now = new Date();
+  const dayFrac = clamp((now.getHours() * 60 + now.getMinutes()) / 1440 + S.seconds / 86400, 0.04, 1);
+  const vol = DAILY_VOLUME[gmTid] * dayFrac;
+  const drain = vol * t.edge;
+  const mine = TABLE_STAKE[gmTid] || 0;
+  const myLoss = TABLE_LOSS[gmTid] || 0;
+  const per100 = t.edge * 100;
+  $('#gmPanel').innerHTML =
+    '<h4>👁 庄家视角 · ' + t.name + '</h4>' +
+    '<div class="gm-stat"><span>本桌庄家优势</span><b style="color:#e74c3c">' + pct(t.edge) + '</b></div>' +
+    '<div class="gm-stat"><span>你每下注 ¥100，庄家平均赚</span><b>¥' + per100.toFixed(2) + '</b></div>' +
+    '<div class="gm-stat"><span>规则来源</span><b style="font-size:11px">' + t.edgeNote + '</b></div>' +
+    '<div class="gm-stat"><span>本桌在线玩家</span><b>' + ONLINE[gmTid].toLocaleString() + ' 人</b></div>' +
+    '<div class="gm-stat"><span>本桌今日总流水</span><b>' + yuan0(vol) + '</b></div>' +
+    '<div class="gm-stat"><span>本桌今日已抽走</span><b style="color:#e74c3c">' + yuan0(drain) + '</b></div>' +
+    '<div class="gm-stat"><span>其中来自你</span><b style="color:#e74c3c">' + yuan0(myLoss) + '</b></div>' +
+    '<div class="flow">' +
+      '<div class="nd"><span class="ic">🪙</span>你的筹码<br>' + yuan0(mine) + '</div>' +
+      '<div class="ar">→</div>' +
+      '<div class="nd"><span class="ic">⚙️</span>抽水机<br>' + pct(t.edge) + '</div>' +
+      '<div class="ar">→</div>' +
+      '<div class="nd"><span class="ic">🏦</span>庄家口袋<br>' + yuan0(myLoss) + '</div>' +
+    '</div>' +
+    '<div class="pump"><i style="width:' + clamp(t.edge * 300, 4, 100) + '%"></i></div>' +
+    '<div class="mini" style="margin-top:9px">' +
+      '这一桌有 ' + ONLINE[gmTid].toLocaleString() + ' 个和你一样的人。' +
+      (mine > 0
+        ? '你贡献了本桌流水的 ' + pct(mine / Math.max(1, vol), 4) + '，' +
+          '但庄家今天已经从这张桌子上抽走了 ' + yuan0(drain) + '。'
+        : '你还没在这桌下注。') + '</div>' +
+    '<button class="btn s" style="margin-top:10px" id="gmClose">收起庄家视角</button>';
+  $('#gmClose').onclick = closeGmPanel;
+}
+
+/* ============================================================================
+   §3.6 揭秘卡
+   ============================================================================ */
+const CARDS = {
+  dice: {
+    name:'骰宝 · 大小单双', tags:['古典概型','期望'],
+    punch:'看起来 50 对 50？"豹子通吃"这一条规则就把你砍到 48.6%。杀你的不是运气，是规则。',
+    body:'三颗骰子共 <b>6³ = 216</b> 种等可能结果（古典概型：样本空间有限、每个基本事件等可能）。' +
+         '其中"大"（11–17 点）与"小"（4–10 点）各 <b>105</b> 种，豹子（三颗同点）<b>6</b> 种。',
+    formula:'P(大) = P(小) = 105/216 = 48.61%\nP(豹子) = 6/216 = 2.78%\n\n' +
+            '押"大"的期望收益：\nE = 105/216 × (+1) + 111/216 × (−1)\n  = −6/216 ≈ −0.0278\n\n' +
+            '庄家优势 = 2.78%　→　每押 ¥100，庄家平均抽走 ¥2.78'
+  },
+  ssc: {
+    name:'时时彩 · 数字彩', tags:['大数定律','中心极限定理'],
+    punch:'实体赌场一年才让你经历 10 万局，时时彩一天 288 期——别人赌一年才摸到的"长期"，你一天就走完了。这不是运气游戏，是抽水泵。',
+    body:'每局期望 μ = −0.01 × 注额。由<b>大数定律</b>，n 局之后你的实际总亏损会稳定收敛到期望总亏损：',
+    formula:'E[总亏损] = 0.01 × n × 注额\n\n一天 288 期 × ¥100 注：\n  = 0.01 × 288 × 100 = ¥288\n  → 每天平均送庄家 ¥288\n一个月（30 天）= ¥8,640 —— 你的生活费\n\n' +
+            '中心极限定理：5 位数字之和近似正态分布，\nP(和 ≥ 23) = P(和 ≤ 22) = 50%（严格对半）'
+  },
+  bac: {
+    name:'百家乐', tags:['期望','频率估计概率'],
+    punch:'赔 8 倍的"和"最诱人，也最毒——庄家优势 14.36%，是押庄的 13 倍。赌场最爱把最坑的选项包装得最华丽。',
+    body:'三种下注的期望收益（和局时庄/闲退还本金）：',
+    formula:'E(押和) = 0.0952 × 8 − 0.9048 × 1 = −0.1440\n  → 每 ¥100 输 ¥14.4（庄家优势 14.36%）\n\n' +
+            'E(押庄) = 0.4586 × 0.95 − 0.5414 × 1 = −0.0106\n  → 庄家优势 1.06%\n\n' +
+            'E(押闲) = 0.4462 × 1 − 0.5538 × 1 = −0.0108\n  → 庄家优势 1.24%\n\n' +
+            '再叠加高频：1 分钟一局，一晚 300 局。\n1% 的优势 × 300 局 = 稳定输光。'
+  },
+  slot: {
+    name:'老虎机', tags:['几何分布','独立性','赌徒谬误'],
+    punch:'机器没有记忆。你已经投了 200 次、"快出大奖了"是错觉——第 201 次三个 7️⃣ 的概率依然是 0.03³ ≈ 0.000027（约 3.7 万分之一）。而且刚才那个"就差一点"，是程序演给你看的。',
+    body:'每次拉杆是<b>独立</b>事件（独立同分布），三轴各自按权重抽样。首次中 7️⃣ 大奖所需次数服从<b>几何分布</b>：',
+    formula:'p = 0.03³ = 0.000027\nX ~ Geometric(p)\nE[X] = 1/p ≈ 37,037 次\n\n' +
+            '¥10/次 × 37,037 次 ≈ ¥370,370\n而 7️⃣7️⃣7️⃣ 的奖金只有 ¥5,000\n\n' +
+            '赌徒谬误的数学本质：独立事件无记忆，\n前 200 次的结果不影响第 201 次。'
+  },
+  sport: {
+    name:'体育赌球', tags:['期望','概率归一化'],
+    punch:'两边都押，稳赚不赔？赔率设计之初就把出口焊死了。而且——赔率从来不是概率本身。',
+    body:'把三个赔率取倒数得到<b>隐含概率</b>，它们之和恒大于 100%：',
+    formula:'1/1.90 + 1/3.60 + 1/4.20\n = 52.63% + 27.78% + 23.81%\n = 104.22%\n\n' +
+            '多出来的 4.22% 就是抽水。\n归一化后的真实概率：\n  主胜 50.50% / 平 26.65% / 客胜 22.85%\n每种下注的期望都是 −4.05%。\n\n' +
+            '对冲验算：押主胜 ¥100 + 客胜 ¥100\n  主胜 → 拿回 ¥190，净亏 ¥10\n  客胜 → 拿回 ¥210，净赚 ¥10\n  平局 → 两注全亏 ¥200\n' +
+            '期望 = 0.505×(−10) + 0.2285×(10) + 0.2665×(−200) = −¥57.5\n\n' +
+            '串关抽水复利：2 串 1 实际优势\n  = 1 − (1−4.05%)² ≈ 7.94%\n串得越多，死得越快。'
+  },
+  dragon: {
+    name:'龙虎斗', tags:['期望 vs 方差','大数定律'],
+    punch:'46.27% 对 46.27%，看着最公平？光"和局退半"这一条就抽走 3.74%。而赔 8 倍的"和"，庄家优势 32.77%——比百家乐的"和"（14.36%）还毒一倍多。赌场最擅长的，就是把最坑的选项包装成最诱人的。',
+    body:'8 副牌单靴（416 张）真发牌，龙、虎各发一张，同点数即"和"。' +
+         '同靴发牌时第二张与第一张同点数概率 = 13 × (32/416) × (31/415) = <b>31/415 = 7.47%</b>。' +
+         '押龙/押虎遇"和"退还一半本金，所以每局期望是负的，且<b>方差很小</b>——' +
+         '它不会让你大起大落，只会让你匀速失血：',
+    formula:'P(龙) = P(虎) = 192/415 = 46.27%\nP(和) = 31/415 = 7.47%\n\n' +
+            'E(押龙) = 0.4627×(+1) + 0.4627×(−1) + 0.0747×(−0.5)\n        = −0.0374\n' +
+            '庄家优势 = 3.74%\n\n' +
+            'E(押和) = 0.0747×8 − 0.9253 = −0.3277\n庄家优势 = 32.77%（比百家乐的"和"还毒一倍多）\n\n' +
+            '期望 × 频率的乘法效应：\n每晚 500 局 × ¥50 注 × 3.74% = ¥935 / 晚\n一个月 ≈ ¥28,000 —— 一年学费还多\n\n' +
+            '方差小 ≠ 安全。小方差的负期望 = 匀速失血。'
+  },
+  redpack: {
+    name:'红包扫雷', tags:['频率与概率','分布偏倚'],
+    punch:'庄家说"尾数 5 的概率是 1/7"，让你以为他挑了个高频尾数。我们用主流社交软件的真实拆包算法跑了 10 万个红包——每个尾数都是 10.0%。他赌的不是分布，是你不会去数。',
+    body:'本桌的尾数直方图是实时统计出来的：抢得越多，每个尾数的频率越贴近 <b>1/10</b>（大数定律）。' +
+         '所谓"高频尾数"是话术，不是数学。真正杀死你的是<b>不对称赔率</b>：',
+    formula:'每抢一次需押 ¥10（底注）\n抢到的金额 x 归你，E[x] = 100/10 = ¥10\n若 x 的尾数 = 5（概率 0.1），赔 5x 给庄家\n\n' +
+            'E = −10 + 0.9 × 10 + 0.1 × (10 − 50)\n  = −10 + 9 − 4\n  = −5\n\n' +
+            '庄家优势 = 50% —— 全场最高。\n每抢一次，平均送庄家 ¥5。'
+  }
+};
+
+function unlockCard(tid){
+  S.unlocked[tid] = 1;
+  save(); syncNav(); renderLobby();
+  showCard(tid, true);
+}
+
+function showCard(tid, isNew){
+  const c = CARDS[tid], t = T[tid];
+  const layer = $('#cardLayer');
+  layer.classList.remove('hide');
+  layer.innerHTML =
+    '<div class="rv-wrap">' +
+    '<div class="reveal" id="rvCard">' +
+      '<div class="rv-inner">' +
+        '<div class="rv-face rv-front">' +
+          '<div style="font-size:34px">' + t.icon + '</div>' +
+          '<div class="nm">' + c.name + '</div>' +
+          '<div class="tag">' + (isNew ? '累计亏损满 ¥500 · 已解密' : '已解密的揭秘卡') + '</div>' +
+          '<div class="tag" style="color:#c0392b;margin-top:14px">— 点击翻牌 —</div>' +
+        '</div>' +
+        '<div class="rv-face rv-back">' +
+          '<h3>🔓 ' + c.name + ' · 揭秘卡</h3>' +
+          '<p>' + c.body + '</p>' +
+          '<div class="formula">' + c.formula + '</div>' +
+          '<div class="punch">' + c.punch + '</div>' +
+          '<div class="tags">理论标签：' + c.tags.map(x => '<i>' + x + '</i>').join('') + '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<button class="btn s" id="rvClose">收起揭秘卡</button>' +
+    '</div>';
+  const card = $('#rvCard');
+  const inner = $('.rv-inner', card);
+  const back = $('.rv-back', card);
+  /* 背面是绝对定位，容器高度需要按内容实测，否则长卡片会被裁掉 */
+  const fit = () => {
+    const prevPos = back.style.position, prevVis = back.style.visibility;
+    back.style.position = 'static'; back.style.visibility = 'hidden';
+    const h = back.offsetHeight;
+    back.style.position = prevPos; back.style.visibility = prevVis;
+    inner.style.height = Math.max(340, Math.min(h, Math.round(window.innerHeight * 0.8))) + 'px';
+  };
+  fit();
+  window.addEventListener('resize', fit, { once:true });
+  const flip = () => card.classList.add('flip');
+  card.onclick = flip;
+  layer.onclick = e => { if (e.target === layer) flip(); };
+  $('#rvClose').onclick = e => { e.stopPropagation(); layer.classList.add('hide'); layer.innerHTML = ''; };
+  setTimeout(flip, isNew ? 900 : 60);
+}
+
+/* ============================================================================
+   §18.1 注册 / 切换账号
+   ============================================================================ */
+function openAccountPanel(force){
+  closeAllModals();
+  const list = acctList();
+  const cur = ACCT ? ACCT.nick : null;
+  openModal(
+    '<h3 style="color:#ff6a55">注册即送 ¥1,000 体验金</h3>' +
+    '<input id="nickInput" class="nick-input" placeholder="请输入昵称" maxlength="12" ' +
+      'autocomplete="off" autocapitalize="off" spellcheck="false">' +
+    '<button class="btn g shine" id="doReg">一键注册，立即领取</button>' +
+    (list.length
+      ? '<div class="hr"></div>' +
+        '<div class="mini" style="color:#c9bda0;margin-bottom:7px">本机已有账号（点击切换）</div>' +
+        list.map(n => {
+          const f = accountFate(n);
+          return '<button class="btn s acct-row" data-nick="' + n + '">' +
+            '<span>🎫 ' + n + '</span>' +
+            (f.watch ? '<span class="flag">⚑</span>' : '') +
+            '<span class="mono">#' + f.id + '</span></button>';
+        }).join('')
+      : '') +
+    /* 冷色小字（§18.1 照抄） */
+    '<div class="slogan slogan-cold" style="margin-top:12px"><div class="tx">' +
+      '你正在注册的，是一个记录你怎么输的账号。</div></div>' +
+    (force ? '' : '<button class="btn s" data-close>返回游戏</button>'),
+    'gamble');
+
+  const input = $('#nickInput');
+  const reg = () => {
+    const nick = normalizeNick(input.value);
+    if (!nick){
+      input.style.borderColor = '#e8402f';
+      input.placeholder = '昵称不能为空（可用中文/字母/数字）';
+      return;
+    }
+    enterAccount(nick, true);
+  };
+  $('#doReg').onclick = reg;
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') reg(); });
+  setTimeout(() => { try { input.focus(); } catch (e) {} }, 120);
+  $$('.acct-row').forEach(b => b.onclick = () => enterAccount(b.dataset.nick, false));
+}
+/* §3.3-5 切换账号：时时彩未开奖的注单先退回原账号，关掉挂机，各桌局数计数归零 */
+function handOffTables(){
+  if (SSC.pending.length){
+    let back = 0;
+    SSC.pending.forEach(b => { back += b.amt; });
+    SSC.pending = [];
+    if (ACCT){ S.balance += back; save(); }
+  }
+  SSC.auto = false;
+  Dice.rounds = 0; SSC.round = 0; BAC.rounds = 0;
+  Slot.rounds = 0; Sport.rounds = 0; Dragon.rounds = 0; Redpack.rounds = 0;
+}
+/* 进入 / 切换账号：整套存档完全隔离（§18.5） */
+function enterAccount(nick, isNew){
+  handOffTables();
+  ACCT = accountFate(nick);
+  Store.set(K_CUR, nick);
+  rememberAcct(nick);
+  resetState();
+  load();
+  buildNav(); renderLobby(); refreshTopbar(); renderFrozenBar(); applyCold(); renderSteps();
+  closeAllModals();
+  go('v-lobby');
+  const wr = pendingWrench; pendingWrench = false;
+  if (S.frozen){ showFrozen(true); return; }
+  if (wr) openWrench();
+  else if (isNew) welcomeModal();
+}
+
+/* ============================================================================
+   §19 荣誉榜：上半段是平台的假赢家榜，下半段是本机真实战绩榜
+   落差本身就是内容——赌场挂着"荣誉榜"，点开才发现后台记的全是破产。
+   ============================================================================ */
+function boardOf(nick){
+  const d = Store.get(saveKeyOf(nick), null);
+  return d && d.board ? d.board : null;
+}
+/* 汇总本机所有账号的战绩（含当前账号尚未落盘的实时数据） */
+function bestAcrossAccounts(){
+  const rec = { fastBust:null, maxLoss:null, maxStreak:null, rechargeKing:null, busts:null };
+  const consider = (nick, b) => {
+    if (!b) return;
+    const f = accountFate(nick), id = f.id;
+    if (b.fastBust != null && (!rec.fastBust || b.fastBust < rec.fastBust.v))
+      rec.fastBust = { id:id, nick:nick, v:b.fastBust };
+    if (b.maxLoss > 0 && (!rec.maxLoss || b.maxLoss > rec.maxLoss.v))
+      rec.maxLoss = { id:id, nick:nick, v:b.maxLoss };
+    if (b.maxStreak > 0 && (!rec.maxStreak || b.maxStreak > rec.maxStreak.v))
+      rec.maxStreak = { id:id, nick:nick, v:b.maxStreak };
+    if (b.rechargeKing > 0 && (!rec.rechargeKing || b.rechargeKing > rec.rechargeKing.v))
+      rec.rechargeKing = { id:id, nick:nick, v:b.rechargeKing };
+    if (b.busts > 0 && (!rec.busts || b.busts > rec.busts.v))
+      rec.busts = { id:id, nick:nick, v:b.busts };
+  };
+  acctList().forEach(n => consider(n, boardOf(n)));
+  if (ACCT) consider(ACCT.nick, BOARD);        // 当前账号的实时数据也计入
+  return rec;
+}
+function fmtDur(sec){
+  if (sec == null) return '—';
+  return sec < 60 ? sec + ' 秒' : Math.floor(sec / 60) + ' 分 ' + (sec % 60) + ' 秒';
+}
+function openBoard(){
+  closeAllModals();
+  const r = bestAcrossAccounts();
+  const line = (label, cell, fmt) => '<div class="board-real">' + label + '：' +
+    (cell ? '账号 <b>' + cell.id + '</b>（' + cell.nick + '）｜ <b>' + fmt(cell.v) + '</b>'
+          : '<span style="color:#4a6a7a">还没有记录</span>') + '</div>';
+  openModal(
+    /* 上半段 · 平台口吻（暖色 / 金色） */
+    '<div class="board-seg gold">' +
+      '<h3 style="color:#f6e27a">🏆 本平台今日大赢家</h3>' +
+      MARQUEE.slice(0, 8).map(x => '<div class="board-row">' + x + '</div>').join('') +
+    '</div>' +
+    /* 下半段 · 我们的声音（冷色） */
+    '<div class="board-seg cold">' +
+      '<h3 style="color:#8fc7dd">同一台机器上，真实的战绩是这样的</h3>' +
+      line('最快破产', r.fastBust, fmtDur) +
+      line('最大单次亏损', r.maxLoss, v => yuan0(v)) +
+      line('最长连败', r.maxStreak, v => v + ' 局') +
+      line('累计充值王', r.rechargeKing, v => yuan0(v)) +
+      line('历史破产次数', r.busts, v => v + ' 次') +
+      '<div style="margin-top:10px;font-size:12.5px;color:#8fc7dd;line-height:1.8;' +
+        'border-top:1px solid #24404d;padding-top:9px">' +
+        '<b style="color:#d6eef8">平台给你看的是赢家，后台记的是这些。</b></div>' +
+    '</div>' +
+    '<button class="btn p" id="cardGo">📸 生成我的战绩卡片</button>' +
+    '<button class="btn s" data-close>关闭</button>',
+    'gamble');
+  $('#cardGo').onclick = openRecordCard;
+}
+
+/* ============================================================================
+   §18.6 战绩卡片（Canvas 绘制，可截图发班群）
+   ============================================================================ */
+function recordVerdict(){
+  const lost = Math.max(0, S.totalStaked - S.totalReturned);
+  const mins = Math.max(1, Math.round(S.seconds / 60));
+  if (lost <= 0) return '你还没开始输。这大概是唯一的好消息。';
+  const meals = Math.floor(lost / CONV.meal.unit);
+  const months = Math.round(lost / CONV.month.unit * 10) / 10;
+  if (lost < 100) return '你在 ' + mins + ' 分钟里输掉了 ' + meals + ' 顿食堂饭菜。';
+  if (lost < 1000) return '你在 ' + mins + ' 分钟里输掉了 ' + meals + ' 顿食堂饭菜，够吃 ' +
+    Math.max(1, Math.round(meals / 30)) + ' 个月。';
+  return '你在 ' + mins + ' 分钟内输掉了 ' + meals + ' 顿食堂饭菜（约 ' + months +
+    ' 个月生活费）——这不是运气，是数学。';
+}
+function drawRecordCard(cv){
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const lost = Math.max(0, S.totalStaked - S.totalReturned);
+  const mins = Math.floor(S.seconds / 60);
+  ctx.fillStyle = '#0d0d0d'; ctx.fillRect(0, 0, W, H);
+  /* 边框 */
+  ctx.strokeStyle = '#7a6420'; ctx.lineWidth = 3;
+  ctx.strokeRect(8, 8, W - 16, H - 16);
+  /* 标题 */
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#d4af37'; ctx.font = 'bold 26px sans-serif';
+  ctx.fillText('十赌九骗 · 战绩卡', W / 2, 58);
+  ctx.fillStyle = '#8d8d8d'; ctx.font = '13px sans-serif';
+  ctx.fillText('大学生网赌揭秘实验室', W / 2, 82);
+  /* 账号 */
+  ctx.fillStyle = '#f6e27a'; ctx.font = 'bold 18px monospace';
+  ctx.fillText('账号 ' + (ACCT ? ACCT.id : '—') + '　' + (ACCT ? ACCT.nick : ''), W / 2, 122);
+  if (ACCT && ACCT.watch){
+    ctx.fillStyle = '#e8402f'; ctx.font = 'bold 13px sans-serif';
+    ctx.fillText('⚑ 重点关照账号', W / 2, 145);
+  }
+  /* 数据行 */
+  const rows = [
+    ['总充值', yuan0(S.recharged)],
+    ['总下注', yuan0(S.totalStaked)],
+    ['总亏损', yuan0(lost)],
+    ['破产次数', S.bankruptCount + ' 次'],
+    ['最长连败', S.bestLoseStreak + ' 局'],
+    ['存活时长', mins + ' 分钟']
+  ];
+  ctx.textAlign = 'left';
+  const top = 178, lh = 34;
+  rows.forEach((r, i) => {
+    const y = top + i * lh;
+    ctx.fillStyle = '#8d8d8d'; ctx.font = '14px sans-serif';
+    ctx.fillText(r[0], 46, y);
+    ctx.fillStyle = i === 2 ? '#e8402f' : '#e8e8e8';
+    ctx.font = 'bold 16px monospace';
+    ctx.textAlign = 'right'; ctx.fillText(r[1], W - 46, y); ctx.textAlign = 'left';
+  });
+  /* 结论 */
+  const vy = top + rows.length * lh + 18;
+  ctx.fillStyle = '#1a1a1a'; ctx.fillRect(30, vy - 26, W - 60, 62);
+  ctx.strokeStyle = '#3a2f18'; ctx.lineWidth = 1; ctx.strokeRect(30, vy - 26, W - 60, 62);
+  ctx.fillStyle = '#ffb0a0'; ctx.font = 'bold 15px sans-serif'; ctx.textAlign = 'center';
+  const v = recordVerdict();
+  ctx.fillText(v.slice(0, 26), W / 2, vy);
+  if (v.length > 26) ctx.fillText(v.slice(26, 52), W / 2, vy + 22);
+  /* 页脚合规声明 */
+  ctx.fillStyle = '#5f5f5f'; ctx.font = '12px sans-serif';
+  ctx.fillText('反赌教育模拟 · 所有资金均为虚拟数字', W / 2, H - 30);
+  ctx.textAlign = 'left';
+}
+function openRecordCard(){
+  closeAllModals();
+  const layer = $('#cardLayer');
+  layer.classList.remove('hide');
+  layer.innerHTML =
+    '<div class="rv-wrap">' +
+      '<canvas class="record" id="recCv" width="620" height="620"></canvas>' +
+      '<div class="mini" style="text-align:center;color:#f6e27a;font-size:13.5px">' +
+        '长按截图，发到班群里比一比谁死得快。</div>' +
+      '<button class="btn s" id="recClose">关闭</button>' +
+    '</div>';
+  drawRecordCard($('#recCv'));
+  layer.onclick = e => { if (e.target === layer) { layer.classList.add('hide'); layer.innerHTML = ''; } };
+  $('#recClose').onclick = () => { layer.classList.add('hide'); layer.innerHTML = ''; };
+}
+$('#btnBoard').onclick = openBoard;
+
+/* 首次进入的引导（每个账号各一次） */
+function welcomeModal(){
+  openModal(
+    '<h3>欢迎来到「十赌九骗」实验室</h3>' +
+    '<div class="note" style="font-size:14px;color:#d8d0c0;line-height:1.95">' +
+      '账号 <b style="color:#f6e27a">' + ACCT.id + '</b>（' + ACCT.nick + '）已开通，' +
+      '送你 <b style="color:#d4af37">¥1,000</b> 虚拟体验金，七张赌桌随便玩。<br>' +
+      '规则、赔率、概率全部真实——<b>唯一不真实的是：这些钱不是你的。</b><br><br>' +
+      '注意屏幕上同时出现的两套话术：<br>' +
+      '<span style="color:#ff8a72">红色那套，是写来让你继续下注的。</span><br>' +
+      '<span style="color:#8fc7dd">冷色那套，是给你报账的。</span><br><br>' +
+      '还有三件事：<br>' +
+      '① 每一桌的庄家优势都写在明面上，但它不会阻止你输光；<br>' +
+      '② 你可以随时"充值"，每次都会有人提醒你这些钱在现实里等于什么；<br>' +
+      '③ 你可以点"提现"——第一次它会成功，然后你会知道结果。' +
+    '</div>' +
+    '<button class="btn p" data-close>开始（我知道这是假的）</button>' +
+    '<div class="mini" style="text-align:center;margin-top:8px">' +
+      '本软件为反赌教育模拟程序，所有充值、彩金、提现均为虚拟数字，不涉及任何真实资金</div>');
+}
+
+/* ============================================================================
+   大厅卡片墙
+   ============================================================================ */
+function renderLobby(){
+  const grid = $('#lobbyGrid');
+  if (!grid) return;
+  grid.innerHTML = TABLES.map(t => {
+    const loss = TABLE_LOSS[t.id] || 0;
+    const un = S.unlocked[t.id];
+    return '<div class="tcard' + (un ? ' unlocked' : '') + '" data-tid="' + t.id + '">' +
+      (un ? '<div class="stamp">已解密</div>' : '') +
+      '<div class="ico">' + t.icon + '</div>' +
+      '<div class="nm">' + t.name + '</div>' +
+      '<div class="ad">' + t.ad + '</div>' +
+      '<div class="st">' +
+        '<span' + (un ? '' : ' style="color:#4a4a4a"') + '>庄家优势 ' +
+          (un ? pct(t.edge) : '？？？') + '</span>' +
+        '<span class="' + (loss > 0 ? 'loss' : '') + '">' +
+          (loss > 0 ? '已亏 ' + yuan0(loss) : (un ? '已解密' : '未解锁揭秘卡')) + '</span>' +
+      '</div></div>';
+  }).join('');
+  $$('#lobbyGrid .tcard').forEach(c => {
+    c.onclick = () => go(T[c.dataset.tid].view);
+    const tid = c.dataset.tid;
+    c.oncontextmenu = e => { e.preventDefault(); if (S.unlocked[tid]) showCard(tid, false); };
+    /* 长按查看已解密卡（手机端） */
+    let lp = null;
+    c.addEventListener('touchstart', () => {
+      if (!S.unlocked[tid]) return;
+      lp = setTimeout(() => { lp = null; showCard(tid, false); }, 600);
+    }, {passive:true});
+    c.addEventListener('touchend', () => { if (lp) clearTimeout(lp); });
+  });
+  $('#wrenchHint').textContent = CHEAT.rounds() > 0
+    ? '后台已记录 ' + CHEAT.rounds() + ' 局调参' : '';
+  renderVip(); renderDual(); applyCold();
+}
+/* ============================================================================
+   赌桌公共构件
+   ============================================================================ */
+/* §17.1 筹码档位：¥10/50/100/500/1,000/5,000（后两档 VIP 金色）+ 加倍 + 全押 */
+const AMOUNTS = [10, 50, 100, 500, 1000, 5000];
+const VIP_AMT = 1000;
+function chipsHTML(cur){
+  return '<div class="chips">' +
+    '<span class="mini" style="align-self:center">下注额 <b class="mono" data-amtnow ' +
+      'style="color:#d4af37">' + yuan0(cur) + '</b></span>' +
+    AMOUNTS.map(a => '<button class="chip' + (a === cur ? ' sel' : '') + (a >= VIP_AMT ? ' vip' : '') +
+      '" data-amt="' + a + '">¥' + a.toLocaleString('zh-CN') +
+      (a >= VIP_AMT ? '<i>VIP</i>' : '') + '</button>').join('') +
+    '<button class="chip dbl" data-dbl>加倍</button>' +
+    '<button class="chip allin" data-allin>全押</button>' +
+    '</div>' +
+    '<div class="allin-tip hide" data-allintip>🔥 一把回本，就差这一把</div>';
+}
+function wireChips(host, get, set){
+  const sync = () => {
+    $$('.chip[data-amt]', host).forEach(x => x.classList.toggle('sel', +x.dataset.amt === get()));
+    $$('[data-amtnow]', host).forEach(x => x.textContent = yuan0(get()));
+  };
+  $$('.chip[data-amt]', host).forEach(c => c.onclick = () => { set(+c.dataset.amt); sync(); });
+  $$('.chip[data-dbl]', host).forEach(b => b.onclick = () => {
+    const cap = Math.max(AMOUNTS[0], Math.floor(wallet()));
+    set(Math.min(get() * 2, cap)); sync(); chipSound(1400);
+  });
+  $$('.chip[data-allin]', host).forEach(b => b.onclick = () => {
+    set(Math.max(AMOUNTS[0], Math.floor(wallet()))); sync(); chipSound(1200);
+  });
+  sync();
+  refreshAllInPulse();
+}
+/* §17.2 连输 3 局后全押按钮进入呼吸态 */
+function refreshAllInPulse(){
+  const on = S.loseStreak >= 3 && !S.frozen;
+  $$('.chip[data-allin]').forEach(b => b.classList.toggle('pulse', on));
+  $$('[data-allintip]').forEach(t => t.classList.toggle('hide', !on));
+}
+function tableHeadHTML(tid, sub){
+  const t = T[tid];
+  return '<div class="table-head">' +
+    '<button class="eye" data-back>← 大厅</button>' +
+    '<h2>' + t.icon + ' ' + t.name + '</h2>' +
+    '<span class="mini" style="flex:1 1 100%;order:3">' + (sub || '') + '</span>' +
+    '<button class="eye" data-gm="' + tid + '">👁 庄家视角</button>' +
+    '</div>' +
+    dealerHTML(t.name);      /* §13.1 真人荷官占位框 + 筹码堆 */
+}
+function wireTable(host){
+  $$('[data-back]', host).forEach(b => b.onclick = () => go('v-lobby'));
+  $$('[data-gm]', host).forEach(b => b.onclick = () => openGmPanel(b.dataset.gm));
+}
+function statsHTML(tid, rounds){
+  const staked = TABLE_STAKE[tid] || 0, loss = TABLE_LOSS[tid] || 0;
+  const real = staked > 0 ? loss / staked : 0;
+  return '<div class="stat-line">' +
+    '<span>本桌已玩 <b>' + rounds + '</b> 局</span>' +
+    '<span>累计流水 <b>' + yuan0(staked) + '</b></span>' +
+    '<span>累计亏损 <b style="color:#e07a6a">' + yuan0(loss) + '</b></span>' +
+    '<span>实测庄家优势 <b>' + pct(real) + '</b> <span class="mini">(理论 ' + pct(EDGE[tid]) +
+      '，样本越大越接近)</span></span>' +
+    '</div>';
+}
+function needFunds(n){
+  if (frozenBlock()) return false;              // §13.3 冻结后拦截一切下注入口
+  if (canBet(n)) return true;
+  openRecharge();
+  return false;
+}
+/* 一局结算：扣注 → 返还 → 记账 */
+function settle(tid, stake, returned){
+  spend(stake);
+  return settleReserved(tid, stake, returned);
+}
+/* 注金已在别处预扣（如时时彩先扣后开奖）时用这个，避免重复扣款 */
+function settleReserved(tid, stake, returned){
+  if (returned > 0) gain(returned);
+  addTableResult(tid, stake, returned);
+  return returned - stake;
+}
+function resultClass(net){ return net > 0 ? 'win' : net < 0 ? 'lose' : 'push'; }
+function resultText(net){ return net > 0 ? '赢 ' + yuan(net) : net < 0 ? '输 ' + yuan(-net) : '走水（退还本金）'; }
+
+/* ============================================================================
+   §4.1 骰宝 · 大小单双
+   ============================================================================ */
+const DICE_PIPS = { 1:[4], 2:[0,8], 3:[0,4,8], 4:[0,2,6,8], 5:[0,2,4,6,8], 6:[0,2,3,5,6,8] };
+const Dice = { amt:50, rounds:0, rolling:false };
+
+function renderDice(){
+  $('#v-dice').innerHTML =
+    '<div class="table-wrap">' + tableHeadHTML('dice', '三颗骰子，押大（11–17 点）或押小（4–10 点），赔率 1:1。三颗同点（豹子）时大小全输——庄家通吃。') +
+      '<div class="stage" id="diceStage">' +
+        [0,1,2].map(i => '<div class="die" id="die' + i + '">' +
+          '<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>').join('') +
+      '</div>' +
+      '<div class="out" id="diceOut">选择「押大」或「押小」开始。豹子（三颗同点）通吃。</div>' +
+      chipsHTML(Dice.amt) +
+      '<div class="bet-row">' +
+        '<button class="bet-btn" data-side="big">押 大<small>11–17 点 · 1:1</small></button>' +
+        '<button class="bet-btn" data-side="small">押 小<small>4–10 点 · 1:1</small></button>' +
+      '</div>' +
+      statsHTML('dice', Dice.rounds) +
+    '</div>';
+  wireTable($('#v-dice'));
+  wireChips($('#v-dice'), () => Dice.amt, v => Dice.amt = v);
+  $$('#v-dice [data-side]').forEach(b => b.onclick = () => dicePlay(b.dataset.side));
+  drawDiceFace(0, 1); drawDiceFace(1, 1); drawDiceFace(2, 1);
+}
+function drawDiceFace(i, face){
+  const d = $('#die' + i); if (!d) return;
+  const on = DICE_PIPS[face];
+  $$('i', d).forEach((p, k) => p.classList.toggle('on', on.indexOf(k) >= 0));
+}
+/* §16.2 杀猪期覆盖骰宝：直接乘胜率（拒绝采样直到结果符合后台要求） */
+function diceDrawForced(side){
+  const w = CHEAT.rate('dice', 105/216);
+  const wantWin = Math.random() < w;
+  for (let i = 0; i < 300; i++){
+    const c = [ri(1,6), ri(1,6), ri(1,6)];
+    const leo = (c[0] === c[1] && c[1] === c[2]);
+    const s = c[0] + c[1] + c[2];
+    const win = leo ? false : (side === 'big' ? s >= 11 : s <= 10);
+    if (win === wantWin) return c;
+  }
+  return [ri(1,6), ri(1,6), ri(1,6)];
+}
+function dicePlay(side){
+  if (Dice.rolling) return;
+  if (!needFunds(Dice.amt)) return;
+  Dice.rolling = true;
+  const bet = Dice.amt;
+  $$('#v-dice .bet-btn').forEach(b => b.disabled = true);
+  const d = diceDrawForced(side);
+  const sum = d[0] + d[1] + d[2];
+  const leo = (d[0] === d[1] && d[1] === d[2]);
+  $('#diceOut').innerHTML = '<span style="color:#9fc7b0">骰子滚动中…</span>';
+  [0,1,2].forEach(i => $('#die' + i).classList.add('rolling'));
+  const spin = setInterval(() => { for (let i = 0; i < 3; i++) drawDiceFace(i, ri(1,6)); }, 70);
+  setTimeout(() => {
+    clearInterval(spin);
+    [0,1,2].forEach(i => { $('#die' + i).classList.remove('rolling'); drawDiceFace(i, d[i]); });
+    const win = leo ? false : (side === 'big' ? sum >= 11 : sum <= 10);
+    const returned = win ? bet * 2 : 0;
+    const net = settle('dice', bet, returned);
+    Dice.rounds++;
+    if (win){ coinRain(12); chipSound(2100); } else chipSound(1100);
+    const sumTxt = d.join(' + ') + ' = ' + sum;
+    $('#diceOut').innerHTML =
+      '开奖：' + sumTxt + '　' + (leo ? '<b style="color:#e74c3c">豹子！大小通吃</b>'
+        : (sum >= 11 ? '【大】' : '【小】')) + '<br>' +
+      '你押【' + (side === 'big' ? '大' : '小') + '】 → ' +
+      '<span class="' + resultClass(net) + '">' + resultText(net) + '</span>' +
+      (leo ? '　<span class="mini">规则杀：这一把无论押哪边都输。</span>' : '');
+    $$('#v-dice .bet-btn').forEach(b => b.disabled = false);
+    const sl = $('#v-dice .stat-line');
+    if (sl) sl.outerHTML = statsHTML('dice', Dice.rounds);
+    Dice.rolling = false;
+  }, 780);
+}
+viewHooks['v-dice'] = { enter: renderDice };
+
+/* ============================================================================
+   §4.2 时时彩 · 数字彩（挂载 §3.4 后台调参作弊层）
+   ============================================================================ */
+const SSC = {
+  amt:50, side:'big', pos:0, digit:3,
+  auto:false, autoSide:'big', autoAmt:50,
+  round:0, timer:5, num:[0,0,0,0,0], pending:[], history:[],
+  staked:0, returned:0, running:false, lastHit:null
+};
+
+function renderSSC(){
+  $('#v-ssc').innerHTML =
+    '<div class="table-wrap">' + tableHeadHTML('ssc',
+      '每 5 秒一期（真实平台 5 分钟一期，此处加速以增强节奏）。开奖为 5 位数字，每位 0–9 独立均匀。') +
+      '<div class="row" style="justify-content:space-between;margin-bottom:8px">' +
+        '<span class="mini">第 <b id="sscRound" style="color:#d4af37">0</b> 期</span>' +
+        '<span class="countdown">下期开奖倒计时 <b id="sscCd">5</b> 秒</span>' +
+      '</div>' +
+      '<div class="balls" id="sscBalls">' +
+        [0,1,2,3,4].map(i => '<div class="ball" id="sscB' + i + '"><span class="flip">0</span></div>').join('') +
+      '</div>' +
+      '<div class="out" id="sscOut" style="margin-top:12px">选一个玩法下注，5 秒后开奖。</div>' +
+      chipsHTML(SSC.amt) +
+      '<div class="bet-row">' +
+        '<button class="bet-btn" data-ssc="big">押 大<small>5 位和 ≥ 23 · 1:0.98</small></button>' +
+        '<button class="bet-btn" data-ssc="small">押 小<small>5 位和 ≤ 22 · 1:0.98</small></button>' +
+      '</div>' +
+      '<div class="card tight" style="background:#0c0c0c;border-color:#252525;margin-top:10px">' +
+        '<div class="mini" style="color:#c9bda0;margin-bottom:6px">独胆 · 猜中指定某一位的数字，赔率 1:8.8（公平赔率应为 9）</div>' +
+        '<div class="chips"><span class="mini" style="align-self:center">位次</span>' +
+          [0,1,2,3,4].map(i => '<button class="chip' + (i === SSC.pos ? ' sel' : '') + '" data-pos="' + i + '">第' + (i+1) + '位</button>').join('') +
+        '</div>' +
+        '<div class="chips"><span class="mini" style="align-self:center">数字</span>' +
+          [0,1,2,3,4,5,6,7,8,9].map(d => '<button class="chip' + (d === SSC.digit ? ' sel' : '') + '" data-dig="' + d + '">' + d + '</button>').join('') +
+        '</div>' +
+        '<button class="bet-btn wide" style="width:100%;margin-top:6px" data-ssc="digit">押独胆 ' + SSC.digit + '（第' + (SSC.pos+1) + '位）</button>' +
+      '</div>' +
+      '<div class="auto-box">' +
+        '<div class="switch" id="sscAuto"></div>' +
+        '<span>自动下注（挂机）</span>' +
+        '<select id="sscAutoSide" class="chip" style="min-width:78px;height:34px;padding:0 8px;border-radius:8px;background:#1c1c1c;color:#ddd">' +
+          '<option value="big">每期押大</option><option value="small">每期押小</option></select>' +
+        '<span class="mini">每期固定 <b id="sscAutoAmt">¥' + SSC.autoAmt + '</b></span>' +
+        '<span class="mini" id="sscAutoInfo"></span>' +
+      '</div>' +
+      statsHTML('ssc', SSC.round) +
+    '</div>';
+  wireTable($('#v-ssc'));
+  wireChips($('#v-ssc'), () => SSC.amt, v => SSC.amt = v);
+  $$('#v-ssc [data-ssc]').forEach(b => b.onclick = () => sscBet(b.dataset.ssc));
+  $$('#v-ssc [data-pos]').forEach(b => b.onclick = () => { SSC.pos = +b.dataset.pos;
+    $$('#v-ssc [data-pos]').forEach(x => x.classList.toggle('sel', +x.dataset.pos === SSC.pos));
+    const bb = $('#v-ssc [data-ssc="digit"]'); if (bb) bb.innerHTML = '押独胆 ' + SSC.digit + '（第' + (SSC.pos+1) + '位）'; });
+  $$('#v-ssc [data-dig]').forEach(b => b.onclick = () => { SSC.digit = +b.dataset.dig;
+    $$('#v-ssc [data-dig]').forEach(x => x.classList.toggle('sel', +x.dataset.dig === SSC.digit));
+    const bb = $('#v-ssc [data-ssc="digit"]'); if (bb) bb.innerHTML = '押独胆 ' + SSC.digit + '（第' + (SSC.pos+1) + '位）'; });
+  $('#sscAuto').onclick = () => {
+    SSC.auto = !SSC.auto;
+    $('#sscAuto').classList.toggle('on', SSC.auto);
+    if (SSC.auto && !SSC.running) startSSC();
+    sscAutoInfo();
+  };
+  $('#sscAutoSide').onchange = e => SSC.autoSide = e.target.value;
+  $('#sscAutoSide').value = SSC.autoSide;
+  sscPaint(SSC.num);
+  sscAutoInfo();
+}
+function sscAutoInfo(){
+  const n = SSC.round, exp = 0.01 * SSC.autoAmt * n;
+  $('#sscAutoInfo').innerHTML = SSC.auto
+    ? '已挂机 ' + n + ' 期 · 期望亏损 0.01×' + SSC.autoAmt + '×' + n + ' = <b style="color:#e74c3c">' + yuan(exp) + '</b>'
+    : '';
+}
+function sscPaint(num){
+  num.forEach((v, i) => {
+    const b = $('#sscB' + i); if (!b) return;
+    $('.flip', b).textContent = v;
+    b.classList.toggle('hit', SSC.lastHit === i);
+  });
+}
+function sscBet(type){
+  if (type === 'digit'){
+    if (!needFunds(SSC.amt)) return;
+    SSC.pending.push({ type:'digit', amt:SSC.amt, pos:SSC.pos, digit:SSC.digit });
+    flashOut('已下注：独胆 ' + SSC.digit + '（第' + (SSC.pos+1) + '位） ¥' + SSC.amt + '，等待开奖…');
+  } else {
+    if (!needFunds(SSC.amt)) return;
+    SSC.pending.push({ type, amt:SSC.amt });
+    flashOut('已下注：' + (type === 'big' ? '大' : '小') + ' ¥' + SSC.amt + '，等待开奖…');
+  }
+  spend(SSC.amt);
+  SSC.staked += SSC.amt;
+  if (!SSC.running) startSSC();
+}
+function flashOut(html){
+  const o = $('#sscOut'); if (o) o.innerHTML = html;
+}
+function startSSC(){
+  if (SSC.running) return;
+  SSC.running = true;
+  SSC.timer = 5;
+  SSC.tick = setInterval(() => {
+    if (curView !== 'v-ssc'){ return; }   // 离开页面暂停节奏
+    SSC.timer--;
+    const cd = $('#sscCd'); if (cd) cd.textContent = Math.max(0, SSC.timer);
+    if (SSC.timer <= 0){ sscDraw(); SSC.timer = 5; }
+  }, 1000);
+}
+function sscGen(pred, want, fallback){
+  for (let i = 0; i < 300; i++){
+    const n = [ri(0,9), ri(0,9), ri(0,9), ri(0,9), ri(0,9)];
+    if (pred(n) === want) return n;
+  }
+  return fallback;
+}
+function sscDraw(){
+  /* 自动下注：本期先补一注（冻结后停止挂机） */
+  if (SSC.auto && S.frozen){ SSC.auto = false; const sw = $('#sscAuto'); if (sw) sw.classList.remove('on'); }
+  if (SSC.auto && canBet(SSC.autoAmt)){
+    SSC.pending.push({ type: SSC.autoSide, amt: SSC.autoAmt });
+    spend(SSC.autoAmt); SSC.staked += SSC.autoAmt;
+  }
+  const pend = SSC.pending.slice();
+  SSC.pending = [];
+  /* —— 后台调参层（§3.4）：对玩家本期最大的一注生效 —— */
+  let num;
+  const bySide = { big:0, small:0, digit:0 };
+  pend.forEach(b => bySide[b.type] += b.amt);
+  const dom = bySide.big >= bySide.small && bySide.big >= bySide.digit && bySide.big > 0 ? 'big'
+            : bySide.small >= bySide.digit && bySide.small > 0 ? 'small'
+            : bySide.digit > 0 ? 'digit' : null;
+  if (dom){
+    const base = dom === 'digit' ? 0.1 : 0.5;
+    const w = CHEAT.rate('ssc', base);
+    const wantWin = Math.random() < w;
+    if (dom === 'big' || dom === 'small'){
+      const wantBig = dom === 'big' ? wantWin : !wantWin;
+      num = sscGen(n => (n[0]+n[1]+n[2]+n[3]+n[4]) >= 23, wantBig, null);
+    } else {
+      const b0 = pend.filter(x => x.type === 'digit').sort((a,c) => c.amt - a.amt)[0];
+      num = sscGen(n => n[b0.pos] === b0.digit, wantWin, null);
+    }
+  }
+  if (!num) num = [ri(0,9), ri(0,9), ri(0,9), ri(0,9), ri(0,9)];
+  SSC.num = num; SSC.round++;
+  const sum = num.reduce((a, b) => a + b, 0);
+  SSC.lastHit = null;
+  const hitBalls = [];
+  /* 开奖动画 */
+  $$('#sscBalls .ball').forEach(b => { b.classList.add('spin'); });
+  setTimeout(() => { $$('#sscBalls .ball').forEach(b => b.classList.remove('spin')); sscPaint(num); }, 480);
+  setTimeout(() => {
+    let ret = 0, stake = 0, lines = [];
+    pend.forEach(b => {
+      stake += b.amt;
+      if (b.type === 'big' || b.type === 'small'){
+        const win = b.type === 'big' ? sum >= 23 : sum <= 22;
+        if (win){ const r = b.amt * 1.98; ret += r; lines.push('大小 ' + (b.type==='big'?'大':'小') + ' 中 → 返 ' + yuan(r)); }
+        else lines.push('大小 ' + (b.type==='big'?'大':'小') + ' 未中');
+      } else {
+        if (num[b.pos] === b.digit){ const r = b.amt * 9.8; ret += r;
+          lines.push('独胆 ' + b.digit + '（第' + (b.pos+1) + '位）中 → 返 ' + yuan(r));
+          SSC.lastHit = b.pos; hitBalls.push(b.pos);
+        } else lines.push('独胆 ' + b.digit + '（第' + (b.pos+1) + '位）未中（开出 ' + num[b.pos] + '）');
+      }
+    });
+    if (stake > 0){
+      /* 注金在下注那一刻已经扣过（sscBet / 挂机），这里只返还、不重复扣 */
+      const net = settleReserved('ssc', stake, ret);
+      SSC.returned += ret;
+      if (net > 0){ coinRain(10); chipSound(2100); } else chipSound(1050);
+      $('#sscOut').innerHTML =
+        '第 ' + SSC.round + ' 期开奖：<b style="font-family:var(--mono);color:#d4af37">' + num.join(' ') +
+        '</b>　和值 ' + sum + '（' + (sum >= 23 ? '大' : '小') + '）<br>' +
+        lines.join('　·　') + '<br>' +
+        '本期 <span class="' + resultClass(net) + '">' + resultText(net) + '</span>' +
+        (CHEAT.lastWasFish() ? '　<span class="mini" style="color:#27ae60">（新人养鱼期）</span>' : '');
+    } else {
+      $('#sscOut').innerHTML = '第 ' + SSC.round + ' 期开奖：<b style="font-family:var(--mono);color:#d4af37">' +
+        num.join(' ') + '</b>　和值 ' + sum + '（' + (sum >= 23 ? '大' : '小') + '）　<span class="mini">本期未下注</span>';
+    }
+    if (hitBalls.length) setTimeout(() => sscPaint(num), 10);
+    const sl = $('#v-ssc .stat-line'); if (sl) sl.outerHTML = statsHTML('ssc', SSC.round);
+    const rd = $('#sscRound'); if (rd) rd.textContent = SSC.round;
+    sscAutoInfo();
+    renderLobby();
+  }, 520);
+}
+viewHooks['v-ssc'] = { enter(){ renderSSC(); startSSC(); } };
+
+/* ============================================================================
+   §4.3 百家乐（挂载 §3.4 后台调参作弊层）
+   ============================================================================ */
+const BAC = { amt:50, rounds:0, bet:null, dealing:false, shoe:[] };
+
+function bacCard(){ const r = ri(1,13); return { r, v: r >= 10 ? 0 : r, s: rnd(4) }; }
+function bacRankName(r){
+  return r === 1 ? 'A' : r === 11 ? 'J' : r === 12 ? 'Q' : r === 13 ? 'K' : String(r);
+}
+function bacDeal(){
+  const p = [bacCard(), bacCard()], b = [bacCard(), bacCard()];
+  let pt = (p[0].v + p[1].v) % 10, bt = (b[0].v + b[1].v) % 10;
+  if (pt >= 8 || bt >= 8)
+    return { p, b, pt, bt, res: pt > bt ? 'P' : bt > pt ? 'B' : 'T' };
+  let p3 = null;
+  if (pt <= 5){ p3 = bacCard(); p.push(p3); pt = (pt + p3.v) % 10; }
+  if (p3){
+    if (bt <= 2) b.push(bacCard());
+    else if (bt === 3){ if (p3.v !== 8) b.push(bacCard()); }
+    else if (bt === 4){ if (p3.v >= 2 && p3.v <= 7) b.push(bacCard()); }
+    else if (bt === 5){ if (p3.v >= 4 && p3.v <= 7) b.push(bacCard()); }
+    else if (bt === 6){ if (p3.v === 6 || p3.v === 7) b.push(bacCard()); }
+  } else {
+    if (bt <= 5) b.push(bacCard());
+  }
+  bt = b.reduce((s, c) => s + c.v, 0) % 10;
+  return { p, b, pt, bt, res: pt > bt ? 'P' : bt > pt ? 'B' : 'T' };
+}
+/* 后台调参：拒绝采样直到结果落在指定类别 */
+function bacDealForced(desired){
+  for (let i = 0; i < 400; i++){ const d = bacDeal(); if (d.res === desired) return d; }
+  return bacDeal();
+}
+function bacPickTarget(betType){
+  const NAT = { B:0.4586, P:0.4462, T:0.0952 };
+  const base = NAT[betType];
+  const w = CHEAT.rate('bac', base);
+  const others = ['B','P','T'].filter(x => x !== betType);
+  if (Math.random() < w) return betType;
+  const osum = NAT[others[0]] + NAT[others[1]];
+  return Math.random() < NAT[others[0]] / osum ? others[0] : others[1];
+}
+function renderBac(){
+  $('#v-bac').innerHTML =
+    '<div class="table-wrap">' + tableHeadHTML('bac',
+      '庄、闲各发 2 张牌（10/J/Q/K = 0，A = 1），按标准补牌规则（tableau）发第三张。和局时押庄/押闲退还本金。') +
+      '<div class="stage" style="min-height:150px">' +
+        '<div class="handbox"><div class="lbl">闲 PLAYER</div><div class="hand" id="bacP"></div><div class="tot" id="bacPT">—</div></div>' +
+        '<div class="handbox"><div class="lbl">庄 BANKER</div><div class="hand" id="bacB"></div><div class="tot" id="bacBT">—</div></div>' +
+      '</div>' +
+      '<div class="out" id="bacOut">选择下注对象，点「发牌」开始。庄 1:0.95 ｜ 闲 1:1 ｜ 和 1:8</div>' +
+      chipsHTML(BAC.amt) +
+      '<div class="bet-row">' +
+        '<button class="bet-btn" data-bac="B">押 庄<small>1:0.95 · 优势 1.06%</small></button>' +
+        '<button class="bet-btn" data-bac="P">押 闲<small>1:1 · 优势 1.24%</small></button>' +
+        '<button class="bet-btn" data-bac="T">押 和<small>1:8 · 优势 14.36%</small></button>' +
+      '</div>' +
+      statsHTML('bac', BAC.rounds) +
+    '</div>';
+  wireTable($('#v-bac'));
+  wireChips($('#v-bac'), () => BAC.amt, v => BAC.amt = v);
+  $$('#v-bac [data-bac]').forEach(b => b.onclick = () => bacPlay(b.dataset.bac));
+}
+function bacCardHTML(c, i){
+  const red = c.s < 2;
+  const sym = ['♠','♣','♥','♦'][c.s];
+  return '<div class="pcard' + (red ? ' red' : '') + '"><small>' + sym +
+    '</small><b>' + bacRankName(c.r) + '</b></div>';
+}
+function bacPlay(betType){
+  if (BAC.dealing) return;
+  if (!needFunds(BAC.amt)) return;
+  BAC.dealing = true;
+  const bet = BAC.amt;
+  $$('#v-bac [data-bac]').forEach(b => b.disabled = true);
+  $('#bacP').innerHTML = ''; $('#bacB').innerHTML = '';
+  $('#bacPT').textContent = '—'; $('#bacBT').textContent = '—';
+  $('#bacOut').innerHTML = '<span style="color:#9fc7b0">发牌中…</span>';
+  const target = bacPickTarget(betType);
+  const d = bacDealForced(target);
+  const seq = [];
+  seq.push(['P', d.p[0]], ['B', d.b[0]], ['P', d.p[1]], ['B', d.b[1]]);
+  if (d.p[2]) seq.push(['P', d.p[2]]);
+  if (d.b[2]) seq.push(['B', d.b[2]]);
+  let k = 0;
+  const step = () => {
+    if (k >= seq.length){ bacFinish(d, betType, bet); return; }
+    const [who, card] = seq[k++];
+    const host = who === 'P' ? $('#bacP') : $('#bacB');
+    host.insertAdjacentHTML('beforeend', bacCardHTML(card, k));
+    const pt = d.p.reduce((s, c) => s + c.v, 0) % 10, bt = d.b.reduce((s, c) => s + c.v, 0) % 10;
+    if (k >= 2){ $('#bacPT').textContent = d.p.length >= 2 ? pt : '—'; }
+    if (k >= 4){ $('#bacBT').textContent = d.b.length >= 2 ? bt : '—'; }
+    setTimeout(step, 260);
+  };
+  step();
+}
+function bacFinish(d, betType, bet){
+  $('#bacPT').textContent = d.pt; $('#bacBT').textContent = d.bt;
+  let returned = 0;
+  if (betType === 'B') returned = d.res === 'B' ? bet * 1.95 : d.res === 'T' ? bet : 0;
+  else if (betType === 'P') returned = d.res === 'P' ? bet * 2 : d.res === 'T' ? bet : 0;
+  else returned = d.res === 'T' ? bet * 9 : 0;
+  const net = settle('bac', bet, returned);
+  BAC.rounds++;
+  if (net > 0){ coinRain(12); chipSound(2100); } else chipSound(1100);
+  const nm = { B:'庄', P:'闲', T:'和' };
+  $('#bacOut').innerHTML =
+    '开奖：<b style="color:#d4af37">' + nm[d.res] + '赢</b>　（闲 ' + d.pt + ' ｜ 庄 ' + d.bt + '）<br>' +
+    '你押【' + nm[betType] + '】 → <span class="' + resultClass(net) + '">' +
+    (d.res === 'T' && betType !== 'T' ? '和局，退还本金' : resultText(net)) + '</span>' +
+    (betType === 'T' ? '　<span class="mini">押和是全场最坑的选项：庄家优势 14.36%，是押庄的 13 倍。</span>' : '');
+  $$('#v-bac [data-bac]').forEach(b => b.disabled = false);
+  const sl = $('#v-bac .stat-line'); if (sl) sl.outerHTML = statsHTML('bac', BAC.rounds);
+  BAC.dealing = false;
+}
+viewHooks['v-bac'] = { enter: renderBac };
+/* ============================================================================
+   §4.4 老虎机
+   符号权重经 RTP 校准（§4.4 授权微调 🍒 与 🐈‍⬛）：
+     原始权重 RTP = 46.18%，远低于真实老虎机区间；
+     固定其余权重、解 2c³ + 6c² = 0.92 − 0.20578 得 🍒 = 0.3276，🐈‍⬛ = 0.1224
+     最终 RTP = 92.00%，庄家优势 = 8.00%
+   赔付规则：三条线取最高赔付；"任意两个 🍒 ×2" 仅计恰好两个（三条 🍒 按 ×8 计，不叠加）。
+   ============================================================================ */
+const SLOT_SYM = [
+  { k:'🍒',      w:0.3276, p:8   },
+  { k:'🍋',      w:0.18,   p:10  },
+  { k:'🔔',      w:0.14,   p:15  },
+  { k:'⭐',      w:0.12,   p:30  },
+  { k:'💎',      w:0.08,   p:80  },
+  { k:'7️⃣',     w:0.03,   p:500 },
+  { k:'🐈‍⬛',   w:0.1224, p:0   }
+];
+const SLOT_KEYS = SLOT_SYM.map(s => s.k);
+const SLOT_PAY3 = {}; SLOT_SYM.forEach(s => SLOT_PAY3[s.k] = s.p);
+const SLOT_CUM = (() => { let c = 0; return SLOT_SYM.map(s => (c += s.w)); })();
+function slotDraw(){
+  const r = Math.random();
+  for (let i = 0; i < SLOT_CUM.length; i++) if (r < SLOT_CUM[i]) return SLOT_SYM[i].k;
+  return SLOT_SYM[SLOT_SYM.length - 1].k;
+}
+function slotPay(r){
+  if (r[0] === r[1] && r[1] === r[2]) return SLOT_PAY3[r[0]] || 0;
+  let c = 0; for (const x of r) if (x === '🍒') c++;
+  return c === 2 ? 2 : 0;
+}
+const Slot = { amt:10, rounds:0, spinning:false, staked:0, returned:0 };
+
+function renderSlot(){
+  $('#v-slot').innerHTML =
+    '<div class="table-wrap">' + tableHeadHTML('slot', '¥10 一拉。三轴独立同分布，机器没有记忆。') +
+      '<div class="slot" id="slotBox">' +
+        [0,1,2].map(i => '<div class="reel" id="reel' + i + '"><div class="strip">' +
+          '<div class="sym">🍒</div></div></div>').join('') +
+      '</div>' +
+      '<div class="out" id="slotOut" style="margin-top:12px">¥10 一拉。最高 500 倍。</div>' +
+      '<div class="bet-row"><button class="bet-btn" id="slotSpin">🎰 拉 一 把<small>¥10 / 次</small></button></div>' +
+      '<div class="card tight" style="background:#0c0c0c;border-color:#252525">' +
+        '<div class="mini" style="color:#c9bda0;margin-bottom:5px">赔付表（三连线）</div>' +
+        '<div class="paytable">' +
+          '7️⃣7️⃣7️⃣ <b>×500</b>　💎💎💎 <b>×80</b>　⭐⭐⭐ <b>×30</b><br>' +
+          '🔔🔔🔔 <b>×15</b>　🍋🍋🍋 <b>×10</b>　🍒🍒🍒 <b>×8</b>　任意两个 🍒 <b>×2</b>' +
+        '</div>' +
+        '<div class="mini" style="margin-top:7px">单轴概率：' +
+          SLOT_SYM.map(s => s.k + ' ' + (s.w * 100).toFixed(2) + '%').join(' ｜ ') +
+          '<br>实测 RTP（返还率）= <b style="color:#d4af37">92.00%</b>，庄家优势 <b style="color:#e74c3c">8.00%</b></div>' +
+      '</div>' +
+      statsHTML('slot', Slot.rounds) +
+    '</div>';
+  wireTable($('#v-slot'));
+  $('#slotSpin').onclick = slotSpin;
+}
+function buildStrip(reelEl, finalSym){
+  const syms = [];
+  for (let i = 0; i < 23; i++) syms.push(slotDraw());
+  syms.push(finalSym);
+  reelEl.innerHTML = '<div class="strip">' +
+    syms.map(s => '<div class="sym">' + s + '</div>').join('') + '</div>';
+  return $('.strip', reelEl);
+}
+function slotSpin(){
+  if (Slot.spinning) return;
+  if (!needFunds(10)) return;
+  Slot.spinning = true;
+  $('#slotSpin').disabled = true;
+  const res = [slotDraw(), slotDraw(), slotDraw()];
+  /* §16.2 杀猪期覆盖老虎机：乘中奖赔付，等效缩放 RTP */
+  const appliedRtp = CHEAT.rate('slot', 0.92);
+  const slotScale = appliedRtp / 0.92;
+  const pay = slotPay(res) * slotScale;
+  let disp = res.slice(), near = false;
+  if (pay === 0 && Math.random() < 0.10){ disp = ['7️⃣','7️⃣','🍒']; near = true; }
+  $$('#slotBox .reel').forEach(r => r.classList.remove('win'));
+  const durs = [820, 1180, near ? 2500 : 1560];
+  const strips = [];
+  for (let i = 0; i < 3; i++){
+    const reelEl = $('#reel' + i);
+    const strip = buildStrip(reelEl, disp[i]);
+    strips.push(strip);
+    const h = $('.sym', strip).offsetHeight || 92;
+    strip.style.transition = 'none';
+    strip.style.transform = 'translateY(0)';
+    void strip.offsetHeight;
+    strip.style.transition = 'transform ' + durs[i] + 'ms cubic-bezier(.14,.72,.18,1)';
+    strip.style.transform = 'translateY(' + (-22 * h) + 'px)';
+  }
+  $('#slotOut').innerHTML = '<span style="color:#9fc7b0">卷轴转动中…' +
+    (near ? ' <span class="mini">（第三轴好像要停在大奖旁边…）</span>' : '') + '</span>';
+  setTimeout(() => {
+    const returned = Math.round(pay * 10 * 100) / 100;
+    const net = settle('slot', 10, returned);
+    Slot.rounds++;
+    if (pay > 0){ coinRain(pay >= 30 ? 26 : 12); chipSound(pay >= 30 ? 2600 : 2100); }
+    else chipSound(1000);
+    if (pay > 0) $$('#slotBox .reel').forEach(r => r.classList.add('win'));
+    const raw = slotPay(res);
+    const label = raw === 500 ? '7️⃣7️⃣7️⃣ 大奖！' : raw === 80 ? '💎💎💎' : raw === 30 ? '⭐⭐⭐'
+      : raw === 15 ? '🔔🔔🔔' : raw === 10 ? '🍋🍋🍋' : raw === 8 ? '🍒🍒🍒'
+      : raw === 2 ? '任意两个 🍒' : '';
+    $('#slotOut').innerHTML =
+      '结果：' + disp.join(' ') + '　' +
+      (pay > 0 ? '<b style="color:#27ae60">' + label + ' 返 ' + yuan(returned) + '</b>'
+               : '<span style="color:#8d8d8d">未中奖</span>') + '<br>' +
+      '<span class="' + resultClass(net) + '">' + resultText(net) + '</span>' +
+      (near ? '　<span class="mini" style="color:#e07a6a">"就差一点！"—— 这个近失画面是程序演给你看的，' +
+        '你的中奖概率从头到尾没有变过。</span>' : '');
+    $('#slotSpin').disabled = false;
+    Slot.spinning = false;
+    const sl = $('#v-slot .stat-line'); if (sl) sl.outerHTML = statsHTML('slot', Slot.rounds);
+  }, durs[2] + 60);
+}
+viewHooks['v-slot'] = { enter: renderSlot };
+
+/* ============================================================================
+   §4.5 体育赌球
+   赔率 1.90 / 3.60 / 4.20，隐含概率之和 104.22%，抽水 4.22%，每种下注期望 −4.05%
+   ============================================================================ */
+const TEAMS = [['蓝城','白廷'], ['北港联','铁山'], ['银湖','赤岩'], ['星洲','雷霆港'],
+               ['青松','黑鹰城'], ['南屿','赤道联'], ['长风','金鹿'], ['灰岩','白鲨港']];
+const ODDS = [1.90, 3.60, 4.20];
+const IMP  = ODDS.map(o => 1 / o);
+const IMP_SUM = IMP.reduce((a, b) => a + b, 0);
+const TRUE_P = IMP.map(x => x / IMP_SUM);
+const Sport = { amt:50, rounds:0, mode:'single', sel:null, matches:[], sel2:null };
+
+function newMatch(){
+  const p = pick(TEAMS);
+  return { home:p[0], away:p[1], res:null };
+}
+function sportDrawOutcome(){ const r = Math.random();
+  return r < TRUE_P[0] ? 0 : r < TRUE_P[0] + TRUE_P[1] ? 1 : 2; }
+/* §16.2 杀猪期覆盖赌球：按后台给的胜率直接决定赛果 */
+function sportForce(sel, w){
+  if (Math.random() < w) return sel;
+  const others = [0,1,2].filter(i => i !== sel);
+  const s = TRUE_P[others[0]] + TRUE_P[others[1]];
+  return Math.random() < TRUE_P[others[0]] / s ? others[0] : others[1];
+}
+function renderSport(){
+  if (!Sport.matches.length || Sport.matches[0].res !== null){
+    Sport.matches = [newMatch(), newMatch()];
+    Sport.sel = null; Sport.sel2 = null;
+  }
+  const m = Sport.matches[0];
+  const m2 = Sport.matches[1];
+  $('#v-sport').innerHTML =
+    '<div class="table-wrap">' + tableHeadHTML('sport',
+      '赔率 1.90 / 3.60 / 4.20。把三个赔率取倒数相加 = 104.22% —— 多出来的 4.22% 就是抽水，它在你下注之前就已经被拿走了。') +
+      '<div class="match"><span id="spHome">' + m.home + '</span><span class="vs">VS</span><span id="spAway">' + m.away + '</span></div>' +
+      '<div class="odds" id="sportOdds">' +
+        ['主胜','平局','客胜'].map((n, i) =>
+          '<button class="odd' + (Sport.sel === i ? ' sel' : '') + '" data-o="' + i + '">' +
+            '<b>' + ODDS[i].toFixed(2) + '</b><span>' + n + '</span></button>').join('') +
+      '</div>' +
+      '<div class="mini" style="color:#8d8d8d">隐含概率：' +
+        IMP.map((x, i) => (['主胜','平','客胜'][i] + ' ' + pct(x))).join('　') +
+        '　合计 <b style="color:#e74c3c">' + pct(IMP_SUM) + '</b></div>' +
+      '<div class="hr"></div>' +
+      '<div class="row" style="margin-bottom:6px">' +
+        '<button class="chip' + (Sport.mode === 'single' ? ' sel' : '') + '" data-mode="single">单关</button>' +
+        '<button class="chip' + (Sport.mode === 'parlay' ? ' sel' : '') + '" data-mode="parlay">2 串 1</button>' +
+        '<span class="mini" id="sportParlayHint"></span>' +
+      '</div>' +
+      '<div id="sportLeg2" class="' + (Sport.mode === 'parlay' ? '' : 'hide') + '">' +
+        '<div class="match" style="font-size:16px"><span id="spHome2">' + m2.home + '</span>' +
+          '<span class="vs">VS</span><span id="spAway2">' + m2.away + '</span></div>' +
+        '<div class="odds" id="sportOdds2">' +
+          ['主胜','平局','客胜'].map((n, i) =>
+            '<button class="odd' + (Sport.sel2 === i ? ' sel' : '') + '" data-o2="' + i + '">' +
+              '<b>' + ODDS[i].toFixed(2) + '</b><span>' + n + '</span></button>').join('') +
+        '</div>' +
+      '</div>' +
+      '<div class="out" id="sportOut">选一个投注项，然后点「下注」。' +
+        (Sport.mode === 'parlay' ? '串关赔率相乘，两场全中才赢。' : '') + '</div>' +
+      chipsHTML(Sport.amt) +
+      '<div class="bet-row"><button class="bet-btn" id="sportGo">下 注<small id="sportOddsTxt">—</small></button></div>' +
+      statsHTML('sport', Sport.rounds) +
+    '</div>';
+  wireTable($('#v-sport'));
+  wireChips($('#v-sport'), () => Sport.amt, v => Sport.amt = v);
+  $$('#v-sport [data-o]').forEach(b => b.onclick = () => { Sport.sel = +b.dataset.o;
+    $$('#v-sport [data-o]').forEach(x => x.classList.toggle('sel', +x.dataset.o === Sport.sel)); sportOddsTxt(); });
+  $$('#v-sport [data-o2]').forEach(b => b.onclick = () => { Sport.sel2 = +b.dataset.o2;
+    $$('#v-sport [data-o2]').forEach(x => x.classList.toggle('sel', +x.dataset.o2 === Sport.sel2)); sportOddsTxt(); });
+  $$('#v-sport [data-mode]').forEach(b => b.onclick = () => { Sport.mode = b.dataset.mode; renderSport(); });
+  $('#sportGo').onclick = sportPlay;
+  sportOddsTxt();
+}
+function sportOddsTxt(){
+  const t = $('#sportOddsTxt'); if (!t) return;
+  if (Sport.sel == null){ t.textContent = '请先选择投注项'; return; }
+  if (Sport.mode === 'parlay'){
+    if (Sport.sel2 == null){ t.textContent = '请选择第二场投注项'; return; }
+    t.textContent = '2串1 赔率 ' + (ODDS[Sport.sel] * ODDS[Sport.sel2]).toFixed(2);
+  } else t.textContent = '赔率 ' + ODDS[Sport.sel].toFixed(2);
+  const h = $('#sportParlayHint');
+  if (h) h.innerHTML = Sport.mode === 'parlay'
+    ? '两场全中才赢。抽水复利：1 − (1−4.05%)² ≈ <b style="color:#e74c3c">7.94%</b>' : '';
+}
+function sportPlay(){
+  if (Sport.sel == null){ $('#sportOut').innerHTML = '<span class="lose">请先选择投注项</span>'; return; }
+  if (Sport.mode === 'parlay' && Sport.sel2 == null){ $('#sportOut').innerHTML = '<span class="lose">请选择第二场投注项</span>'; return; }
+  if (!needFunds(Sport.amt)) return;
+  const m = Sport.matches[0], m2 = Sport.matches[1];
+  const nm = ['主胜', '平局', '客胜'];
+  const applied1 = CHEAT.rate('sport', TRUE_P[Sport.sel]);
+  const sportScale = applied1 / TRUE_P[Sport.sel];
+  const r1 = sportForce(Sport.sel, applied1); m.res = r1;
+  let returned, detail;
+  if (Sport.mode === 'single'){
+    const win = r1 === Sport.sel;
+    returned = win ? Sport.amt * ODDS[Sport.sel] : 0;
+    detail = m.home + ' ' + (r1 === 0 ? '胜' : r1 === 1 ? '平' : '负') + ' ' + m.away +
+      '　赛果【' + nm[r1] + '】';
+  } else {
+    const r2 = sportForce(Sport.sel2, clamp(TRUE_P[Sport.sel2] * sportScale, 0.005, 0.97));
+    m2.res = r2;
+    const win = (r1 === Sport.sel) && (r2 === Sport.sel2);
+    const o = ODDS[Sport.sel] * ODDS[Sport.sel2];
+    returned = win ? Sport.amt * o : 0;
+    detail = '第1场 ' + m.home + ' vs ' + m.away + ' → 【' + nm[r1] + '】' +
+      (r1 === Sport.sel ? ' ✅' : ' ❌') + '<br>' +
+      '第2场 ' + m2.home + ' vs ' + m2.away + ' → 【' + nm[r2] + '】' +
+      (r2 === Sport.sel2 ? ' ✅' : ' ❌') + '<br>2串1 赔率 ' + o.toFixed(2);
+  }
+  const net = settle('sport', Sport.amt, returned);
+  Sport.rounds++;
+  if (net > 0){ coinRain(14); chipSound(2200); } else chipSound(1100);
+  $('#sportOut').innerHTML = detail + '<br>你押【' + nm[Sport.sel] + (Sport.mode === 'parlay' ? ' + ' + nm[Sport.sel2] : '') +
+    '】 → <span class="' + resultClass(net) + '">' + resultText(net) + '</span>';
+  const sl = $('#v-sport .stat-line'); if (sl) sl.outerHTML = statsHTML('sport', Sport.rounds);
+  /* 1.4 秒后换一场新比赛，只更新队名与选中态，保留上面的结算文本 */
+  setTimeout(() => {
+    if (curView !== 'v-sport') return;
+    Sport.matches = [newMatch(), newMatch()];
+    Sport.sel = null; Sport.sel2 = null;
+    const h1 = $('#spHome'), a1 = $('#spAway'), h2 = $('#spHome2'), a2 = $('#spAway2');
+    if (h1) h1.textContent = Sport.matches[0].home;
+    if (a1) a1.textContent = Sport.matches[0].away;
+    if (h2) h2.textContent = Sport.matches[1].home;
+    if (a2) a2.textContent = Sport.matches[1].away;
+    $$('#v-sport .odd').forEach(b => b.classList.remove('sel'));
+    sportOddsTxt();
+  }, 1400);
+}
+viewHooks['v-sport'] = { enter: renderSport };
+
+/* ============================================================================
+   §4.6 龙虎斗（v1.2 改为真发牌）
+   8 副牌单靴 = 416 张，每点数 32 张。洗牌后依次发两张，牌面即结果。
+   同靴发牌时第二张与第一张同点数概率 = 13 × (32/416) × (31/415) = 31/415 = 7.47%
+     → P(和) = 7.47%，P(龙) = P(虎) = 192/415 = 46.27%
+   E(押龙，和局退半) = 0.4627(+1) + 0.4627(−1) + 0.0747(−0.5) = −0.0374 → 庄家优势 3.74%
+   E(押和，1:8)      = 0.0747×8 − 0.9253                = −0.3277 → 庄家优势 32.77%
+   ============================================================================ */
+const Dragon = { amt:50, rounds:0, busy:false };
+const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const DRAGON_DECKS = 8, DRAGON_SHOE_SIZE = DRAGON_DECKS * 52;   // 416
+let dragonShoe = [];
+function newDragonShoe(){
+  const shoe = [];
+  for (let d = 0; d < DRAGON_DECKS; d++)
+    for (let r = 1; r <= 13; r++)
+      for (let s = 0; s < 4; s++) shoe.push({ r: r, s: s });
+  return shuffle(shoe);                                          // 洗牌
+}
+function dragonDeal(){
+  if (dragonShoe.length < 4) dragonShoe = newDragonShoe();       // 换靴
+  const a = dragonShoe.pop(), b = dragonShoe.pop();              // 真发牌，牌面即结果
+  const cat = a.r > b.r ? 'L' : a.r < b.r ? 'H' : 'T';
+  return { a: a.r, b: b.r, sa: a.s, sb: b.s, cat: cat, left: dragonShoe.length };
+}
+/* §16.2 杀猪期覆盖龙虎斗：仍是真发牌，只是发到后台满意的结果为止 */
+function dragonDealForced(side){
+  const w = CHEAT.rate('dragon', 192/415);
+  const wantWin = Math.random() < w;
+  for (let i = 0; i < 400; i++){
+    const d = dragonDeal();
+    const win = (side === 'T') ? (d.cat === 'T') : (d.cat === side);
+    if (win === wantWin) return d;
+  }
+  return dragonDeal();
+}
+function renderDragon(){
+  if (!dragonShoe.length) dragonShoe = newDragonShoe();
+  $('#v-dragon').innerHTML =
+    '<div class="table-wrap">' + tableHeadHTML('dragon',
+      '8 副牌单靴（416 张）真发牌，龙、虎各发一张比大小，同点数即「和」。' +
+      'P(龙) = P(虎) = 192/415 = 46.27%，P(和) = 31/415 = 7.47%。押龙/虎遇「和」退还一半本金。') +
+      '<div class="row" style="justify-content:center;margin-bottom:6px">' +
+        '<span class="mini">牌靴剩余 <b style="font-family:var(--mono);color:#d4af37" id="dgShoe">' +
+          dragonShoe.length + '</b> / ' + DRAGON_SHOE_SIZE + ' 张</span>' +
+      '</div>' +
+      '<div class="stage" style="min-height:140px">' +
+        '<div class="handbox"><div class="lbl">龙 DRAGON</div><div class="hand" id="dgA"></div></div>' +
+        '<div class="handbox" style="flex:0 0 auto;min-width:40px;color:#8d8d8d">VS</div>' +
+        '<div class="handbox"><div class="lbl">虎 TIGER</div><div class="hand" id="dgB"></div></div>' +
+      '</div>' +
+      '<div class="out" id="dgOut">最公平的玩法，5 秒一局。</div>' +
+      chipsHTML(Dragon.amt) +
+      '<div class="bet-row">' +
+        '<button class="bet-btn" data-dg="L">押 龙<small>1:1 · 优势 3.74%</small></button>' +
+        '<button class="bet-btn" data-dg="H">押 虎<small>1:1 · 优势 3.74%</small></button>' +
+        '<button class="bet-btn" data-dg="T">押 和<small>1:8 · 优势 32.77%</small></button>' +
+      '</div>' +
+      statsHTML('dragon', Dragon.rounds) +
+    '</div>';
+  wireTable($('#v-dragon'));
+  wireChips($('#v-dragon'), () => Dragon.amt, v => Dragon.amt = v);
+  $$('#v-dragon [data-dg]').forEach(b => b.onclick = () => dragonPlay(b.dataset.dg));
+}
+function dgCardHTML(rank, suit){
+  const red = suit < 2;
+  return '<div class="pcard' + (red ? ' red' : '') + '"><small>' + ['♠','♣','♥','♦'][suit] +
+    '</small><b>' + rank + '</b></div>';
+}
+function dragonPlay(side){
+  if (Dragon.busy) return;
+  if (frozenBlock()) return;
+  if (!needFunds(Dragon.amt)) return;
+  Dragon.busy = true;
+  $$('#v-dragon [data-dg]').forEach(b => b.disabled = true);
+  $('#dgA').innerHTML = ''; $('#dgB').innerHTML = '';
+  $('#dgOut').innerHTML = '<span style="color:#9fc7b0">发牌中…</span>';
+  const d = dragonDealForced(side);
+  chipSound(1500);
+  const shoe = $('#dgShoe'); if (shoe) shoe.textContent = d.left;
+  setTimeout(() => { $('#dgA').innerHTML = dgCardHTML(RANKS[d.a - 1], d.sa); }, 120);
+  setTimeout(() => {
+    $('#dgB').innerHTML = dgCardHTML(RANKS[d.b - 1], d.sb);
+    const bet = Dragon.amt;
+    let returned = 0, note = '';
+    if (side === 'T') returned = d.cat === 'T' ? bet * 9 : 0;
+    else if (side === d.cat) returned = bet * 2;
+    else if (d.cat === 'T'){ returned = bet * 0.5; note = '和局，退还一半本金'; }
+    const net = settle('dragon', bet, returned);
+    Dragon.rounds++;
+    if (net > 0){ coinRain(10); chipSound(2100); }
+    const nm = { L:'龙赢', H:'虎赢', T:'和局' };
+    $('#dgOut').innerHTML =
+      '开奖：<b style="color:#d4af37">' + nm[d.cat] + '</b>（' + RANKS[d.a-1] + ' vs ' + RANKS[d.b-1] + '）<br>' +
+      '你押【' + ({L:'龙',H:'虎',T:'和'})[side] + '】 → <span class="' + resultClass(net) + '">' +
+      (note || resultText(net)) + '</span>' +
+      (side === 'T' ? '　<span class="mini">押和庄家优势 32.77%，比百家乐的"和"（14.36%）还毒一倍多。</span>' : '');
+    $$('#v-dragon [data-dg]').forEach(b => b.disabled = false);
+    const sl = $('#v-dragon .stat-line'); if (sl) sl.outerHTML = statsHTML('dragon', Dragon.rounds);
+    Dragon.busy = false;
+  }, 480);
+}
+viewHooks['v-dragon'] = { enter: renderDragon };
+
+/* ============================================================================
+   §4.7 红包扫雷
+   主流社交软件的红包拆分算法：每份 = U[0.01, 2×剩余均值]，最后一份拿剩余。
+   该算法下金额尾数（分位）分布均匀 —— 每个尾数约 10.0%。
+   玩法：每抢一次需押 ¥10 底注；抢到 x 归你；若 x 尾数 = 5（雷），赔 5x 给庄家。
+   E = −10 + 0.9×10 + 0.1×(10 − 50) = −5 → 庄家优势 50%
+   ============================================================================ */
+const RP_TOTAL = 10000, RP_N = 10, RP_STAKE = 10, RP_LEI = 5, RP_MULT = 5;
+function wxRedpack(totalFen, n){
+  const out = []; let rem = totalFen;
+  for (let i = 0; i < n - 1; i++){
+    const left = n - i;
+    const mx = Math.max(1, Math.floor(2 * rem / left));
+    let v = ri(1, mx);
+    if (v > rem - (left - 1)) v = rem - (left - 1);
+    out.push(v); rem -= v;
+  }
+  out.push(rem);
+  return out;
+}
+/* §16.2 杀猪期覆盖红包扫雷：放大中雷概率（等效乘胜率） */
+function wxRedpackForced(wantSafe){
+  for (let i = 0; i < 40; i++){
+    const shares = shuffle(wxRedpack(RP_TOTAL, RP_N));
+    const s = shares.find(v => ((v % 10) === RP_LEI) !== wantSafe);
+    if (s != null) return s;
+  }
+  return shuffle(wxRedpack(RP_TOTAL, RP_N))[0];
+}
+const Redpack = { rounds:0, busy:false, lastFen:0 };
+
+function renderRedpack(){
+  const rp = S.redpack;
+  $('#v-redpack').innerHTML =
+    '<div class="table-wrap">' + tableHeadHTML('redpack',
+      '庄家发 ¥100 红包（10 份），你抢一份。庄家宣布「雷」= 金额尾数为 5——抢到尾数 5 的人，赔偿红包金额 ×5 给庄家。') +
+      '<div class="stage" style="min-height:170px">' +
+        '<div class="rp" id="rpBox"><div class="body"></div><div class="flap"></div>' +
+          '<div class="seal">雷</div><div class="amt" id="rpAmt">¥0.00</div></div>' +
+      '</div>' +
+      '<div class="out" id="rpOut">每抢一次需押 ¥10 底注。抢到的金额归你，中雷赔 5 倍。</div>' +
+      '<div class="bet-row">' +
+        '<button class="bet-btn" data-rp="1">抢 一 次<small>押 ¥10</small></button>' +
+        '<button class="bet-btn" data-rp="10">连 抢 10 次<small>押 ¥100</small></button>' +
+      '</div>' +
+      '<div class="card tight" style="background:#0c0c0c;border-color:#252525">' +
+        '<div class="mini" style="color:#c9bda0;margin-bottom:6px">' +
+          '尾数频率直方图 · 你已抢 <b id="rpN">' + rp.n + '</b> 个红包，平均金额 <b id="rpAvg">' +
+          (rp.n ? '¥' + (rp.sum / rp.n / 100).toFixed(2) : '—') + '</b></div>' +
+        '<div class="histo-wrap"><div class="histo" id="rphisto">' +
+          rp.tails.map((v, i) => '<div class="hb' + (i === RP_LEI ? ' hot' : '') + '" data-t="' + i + '">' +
+            '<span>' + i + '</span></div>').join('') +
+        '</div></div>' +
+        '<div class="mini" style="margin-top:6px">红色 = 庄家选的「雷」（尾数 5）。' +
+          '理论频率每个尾数都是 <b>10.0%</b> —— 抢得越多，柱子越平。' +
+          '所谓"尾数 5 概率更高"是话术，不是数学。</div>' +
+      '</div>' +
+      '<div class="card tight" style="background:#0c0c0c;border-color:#252525">' +
+        '<div class="mini" style="color:#c9bda0">期望收益（每抢一次）</div>' +
+        '<div class="paytable" style="color:#cfe0d5">' +
+          'E = −10（底注）+ 0.9 × 10（抢到的钱）+ 0.1 × (10 − 50)（中雷赔 5 倍）<br>' +
+          '　 = −10 + 9 − 4 = <b style="color:#e74c3c">−5</b>　→　庄家优势 <b style="color:#e74c3c">50%</b>' +
+        '</div>' +
+        '<div class="mini" style="margin-top:6px">90% 的时候你不赚不亏（白玩），10% 的时候赔掉 5 倍。' +
+          '这就是为什么你会一直玩下去。</div>' +
+      '</div>' +
+      statsHTML('redpack', Redpack.rounds) +
+    '</div>';
+  wireTable($('#v-redpack'));
+  $$('#v-redpack [data-rp]').forEach(b => b.onclick = () => rpGrab(+b.dataset.rp));
+  paintHisto();
+}
+function paintHisto(){
+  const rp = S.redpack, host = $('#rphisto'); if (!host) return;
+  const tot = rp.n || 1;
+  const max = Math.max(0.001, ...rp.tails.map(v => v / tot));
+  $$('.hb', host).forEach((b, i) => {
+    const f = rp.tails[i] / tot;
+    b.style.height = (rp.n ? Math.max(3, 88 * f / max) : 3) + 'px';
+    b.title = '尾数 ' + i + '：' + (rp.n ? pct(f, 2) : '—');
+  });
+  const n = $('#rpN'); if (n) n.textContent = rp.n;
+  const a = $('#rpAvg'); if (a) a.textContent = rp.n ? '¥' + (rp.sum / rp.n / 100).toFixed(2) : '—';
+}
+function rpGrab(times){
+  if (Redpack.busy) return;
+  if (!needFunds(RP_STAKE * times)) return;
+  Redpack.busy = true;
+  $$('#v-redpack [data-rp]').forEach(b => b.disabled = true);
+  let done = 0, totalNet = 0, hits = 0, sumFen = 0, lines = [];
+  const step = () => {
+    if (done >= times){ rpFinish(times, totalNet, hits, sumFen, lines); return; }
+    done++;
+    const safeRate = CHEAT.rate('redpack', 0.9);          // 公开"不中雷"概率
+    const fen = wxRedpackForced(Math.random() < safeRate);
+    const hit = (fen % 10) === RP_LEI;
+    S.redpack.tails[fen % 10]++; S.redpack.n++; S.redpack.sum += fen;
+    if (hit) S.redpack.hit++;
+    spend(RP_STAKE);
+    let paid = 0;
+    if (hit){
+      const penalty = RP_MULT * fen / 100;
+      paid = Math.min(penalty, wallet());
+      if (paid > 0) spend(paid);
+    }
+    gain(fen / 100);
+    const net = fen / 100 - RP_STAKE - paid;
+    if (hit){ chipSound(900); } else { coinRain(4); chipSound(2000); }
+    totalNet += net; sumFen += fen; if (hit) hits++;
+    addTableResult('redpack', RP_STAKE + paid, fen / 100);
+    Redpack.rounds++;
+    /* 动画 */
+    const box = $('#rpBox');
+    if (box){
+      box.classList.remove('open');
+      $('#rpAmt').textContent = '¥' + (fen / 100).toFixed(2);
+      $('#rpAmt').style.color = hit ? '#ff8a72' : '#ffe9a8';
+      void box.offsetWidth;
+      box.classList.add('open');
+    }
+    if (times <= 10) lines.push((hit ? '💥' : '🧧') + ' ¥' + (fen / 100).toFixed(2) + (hit ? '（中雷）' : ''));
+    setTimeout(step, times > 1 ? 190 : 420);
+  };
+  step();
+}
+function rpFinish(times, totalNet, hits, sumFen, lines){
+  $('#rpOut').innerHTML =
+    (times > 1 ? '连抢 ' + times + ' 次：抢到 ' + yuan(sumFen / 100) + '，中雷 ' + hits + ' 次<br>' +
+      '<span class="mini">' + lines.join('　') + '</span><br>' : '') +
+    '本次净收益 <span class="' + resultClass(totalNet) + '">' + resultText(totalNet) + '</span>' +
+    '　<span class="mini">平均每次 ' + yuan(totalNet / times) + '</span>';
+  $$('#v-redpack [data-rp]').forEach(b => b.disabled = false);
+  Redpack.busy = false;
+  paintHisto();
+  const sl = $('#v-redpack .stat-line'); if (sl) sl.outerHTML = statsHTML('redpack', Redpack.rounds);
+}
+viewHooks['v-redpack'] = { enter: renderRedpack };
+/* ============================================================================
+   §5 策略实验室
+   4 策略 × 1,000 名玩家 × 1,000 局；起始 ¥1,000，底注 ¥10，轮盘大小单双 p = 18/37 = 48.65%
+   破产判定：资金 < 一注。倍投法受台面限额 ¥500 约束。
+   ============================================================================ */
+const STRATS = [
+  { id:'flat',  name:'平注',              rule:'每局固定 ¥10' },
+  { id:'mart',  name:'倍投法（马丁格尔）', rule:'输了翻倍，赢了回到 ¥10；台面限额 ¥500' },
+  { id:'dal',   name:'达朗贝尔',          rule:'输 +¥10，赢 −¥10，最低 ¥10' },
+  { id:'allin', name:'梭哈',              rule:'每局全押' }
+];
+const P_ROULETTE = 18 / 37;     // 0.4865
+const STRAT_N = 1000, STRAT_R = 1000, STRAT_START = 1000, STRAT_BASE = 10, STRAT_CAP = 500;
+
+function simOne(id, players, rounds, p, start, base, cap){
+  let bust = 0, winCount = 0, survSum = 0, survN = 0;
+  const finals = new Float32Array(players);
+  const curve = new Float32Array(rounds + 1);
+  const hist = new Float32Array(42);          // ¥0–4000，每格 ¥100，第 41 格为溢出
+  for (let i = 0; i < players; i++){
+    let bal = start, bet = base, dead = false;
+    const rec = (i === 0);
+    if (rec) curve[0] = bal;
+    for (let r = 0; r < rounds; r++){
+      if (id === 'flat')      bet = base;
+      else if (id === 'mart') bet = Math.min(bet, cap);
+      else if (id === 'dal')  bet = Math.max(base, bet);
+      else                    bet = bal;
+      if (bet > bal || bal < base){ dead = true; break; }
+      if (Math.random() < p){
+        bal += bet;
+        if (id === 'mart') bet = base;
+        else if (id === 'dal') bet = Math.max(base, bet - base);
+      } else {
+        bal -= bet;
+        if (id === 'mart') bet *= 2;
+        else if (id === 'dal') bet += base;
+      }
+      if (rec) curve[r + 1] = bal;
+    }
+    if (dead){ bust++; bal = 0; }
+    else {
+      survSum += bal; survN++;
+      if (bal > start) winCount++;
+    }
+    finals[i] = bal;
+    const b = bal >= 4000 ? 41 : Math.floor(bal / 100);
+    hist[b]++;
+  }
+  return { id, bust, finals, curve, hist, winCount, survAvg: survN ? survSum / survN : 0 };
+}
+
+let STRAT_RESULT = null;
+function runStrategyLab(){
+  const btn = $('#btnRunStrat');
+  btn.disabled = true;
+  $('#stratStatus').textContent = '模拟中…';
+  const out = [];
+  let k = 0;
+  const t0 = performance.now();
+  const step = () => {
+    if (k >= STRATS.length){
+      STRAT_RESULT = out;
+      const ms = Math.round(performance.now() - t0);
+      $('#stratStatus').innerHTML = '完成：4 策略 × 1,000 人 × 1,000 局 = <b>4,000,000</b> 局，用时 <b>' +
+        ms + ' ms</b>';
+      btn.disabled = false;
+      renderStratResult();
+      return;
+    }
+    out.push(simOne(STRATS[k].id, STRAT_N, STRAT_R, P_ROULETTE, STRAT_START, STRAT_BASE, STRAT_CAP));
+    k++;
+    $('#stratStatus').textContent = '模拟中… ' + k + '/4';
+    requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+function renderStratResult(){
+  $('#stratResult').classList.remove('hide');
+  $('#stratKpi').innerHTML = STRAT_RESULT.map((r, i) =>
+    '<div><div class="v" style="color:' + (r.bust / STRAT_N > 0.85 ? '#e74c3c' : '#d4af37') + '">' +
+      pct(r.bust / STRAT_N, 1) + '</div><div class="k">' + STRATS[i].name + ' 破产率</div></div>').join('') +
+    '<div><div class="v">' + pct(P_ROULETTE) + '</div><div class="k">单局胜率</div></div>';
+  $('#stratCharts').innerHTML = STRAT_RESULT.map((r, i) =>
+    '<div class="card tight"><div class="mini" style="color:#d4af37;margin-bottom:5px">' +
+      STRATS[i].name + '<span style="color:#8d8d8d"> · ' + STRATS[i].rule + '</span></div>' +
+      '<canvas class="cvCurve" data-i="' + i + '" width="520" height="150"></canvas>' +
+      '<canvas class="cvHist" data-i="' + i + '" width="520" height="130" style="margin-top:8px"></canvas>' +
+      '<div class="mini">破产率 <b style="color:#e07a6a">' + pct(r.bust / STRAT_N, 1) + '</b>' +
+      '　存活者平均资金 <b>' + yuan0(r.survAvg) + '</b>' +
+      '　跑赢本金 <b>' + pct(r.winCount / STRAT_N, 1) + '</b></div></div>').join('');
+  STRAT_RESULT.forEach((r, i) => {
+    drawCurve($$('.cvCurve')[i], r.curve, STRAT_START, STRATS[i].name);
+    drawHist($$('.cvHist')[i], r.hist, r.id === 'allin' ? '#c0392b' : '#d4af37');
+  });
+  renderDerive();
+}
+function drawCurve(cv, curve, start, title){
+  const ctx = cv.getContext('2d'), W = cv.width, H = cv.height, pad = 26;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#0d0d0d'; ctx.fillRect(0, 0, W, H);
+  const n = curve.length;
+  let mx = start;
+  for (let i = 0; i < n; i++) if (curve[i] > mx) mx = curve[i];
+  mx = Math.max(mx * 1.1, start * 1.2);
+  const X = i => pad + (W - pad - 8) * (i / (n - 1));
+  const Y = v => H - 16 - (H - 34) * (v / mx);
+  ctx.strokeStyle = '#1e1e1e';
+  for (let i = 0; i <= 3; i++){ const y = 14 + (H - 30) * i / 3;
+    ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W - 8, y); ctx.stroke(); }
+  ctx.setLineDash([4, 4]); ctx.strokeStyle = '#3a3a3a';
+  ctx.beginPath(); ctx.moveTo(pad, Y(start)); ctx.lineTo(W - 8, Y(start)); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 1.6; ctx.beginPath();
+  for (let i = 0; i < n; i++){ const x = X(i), y = Y(curve[i]); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+  ctx.stroke();
+  ctx.fillStyle = '#6a6a6a'; ctx.font = '10px monospace';
+  ctx.fillText('起始 ¥1,000', pad + 3, Y(start) - 4);
+  ctx.fillText('资金曲线（1 名代表性玩家）', pad, 11);
+  ctx.fillText('¥0', 4, H - 16);
+}
+function drawHist(cv, hist, color){
+  const ctx = cv.getContext('2d'), W = cv.width, H = cv.height, pad = 26;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#0d0d0d'; ctx.fillRect(0, 0, W, H);
+  const n = hist.length;
+  let mx = 1; for (let i = 0; i < n; i++) if (hist[i] > mx) mx = hist[i];
+  const bw = (W - pad - 8) / n;
+  for (let i = 0; i < n; i++){
+    const h = (H - 30) * hist[i] / mx;
+    ctx.fillStyle = i === 0 ? '#c0392b' : color;
+    ctx.globalAlpha = i === 0 ? 1 : 0.75;
+    ctx.fillRect(pad + i * bw, H - 16 - h, Math.max(1, bw - 1), h);
+  }
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = '#6a6a6a'; ctx.font = '10px monospace';
+  ctx.fillText('最终资金分布（1,000 人）', pad, 11);
+  ctx.fillText('¥0', pad, H - 4);
+  ctx.fillText('¥4,000+', W - 58, H - 4);
+  ctx.fillStyle = '#c0392b'; ctx.fillText('← 破产', pad + 2, H - 4);
+}
+function renderDerive(){
+  const i = 1000, N = 1000000, p = P_ROULETTE, q = 1 - p, r = q / p;
+  const fair = 1 - i / N;
+  $('#deriveBox').innerHTML =
+    '<div class="note" style="line-height:2">' +
+      '<b style="color:#d4af37">① 公平赌局（p = 0.5）</b><br>' +
+      '资金 i 的玩家对阵资金 N 的庄家，最终破产概率：<br>' +
+      '<span class="mono" style="color:#cfe0d5">P(破产) = 1 − i/N</span><br>' +
+      '代入 i = ¥1,000、N = ¥1,000,000 → P = 1 − 0.001 = <b>' + pct(fair) + '</b>' +
+      '　<span class="mini">（庄家的资金是你的 1000 倍，你也有 0.1% 的机会把他赢光——但前提是公平。）</span>' +
+    '</div>' +
+    '<div class="hr"></div>' +
+    '<div class="note" style="line-height:2">' +
+      '<b style="color:#d4af37">② 轮盘（p = 18/37 = 48.65%）</b><br>' +
+      '带吸收壁的随机游走，有限庄家的精确解：<br>' +
+      '<span class="mono" style="color:#cfe0d5">P(破产) = [ (q/p)ⁱ − (q/p)^(i+N) ] / [ 1 − (q/p)^(i+N) ]</span><br>' +
+      '这里 q/p = ' + (Math.round(r * 100000) / 100000) + ' &gt; 1，代入 i = 1,000、N = 1,000,000：<br>' +
+      '<span class="mono" style="color:#cfe0d5">(q/p)^1000 = 10^' + (1000 * Math.log10(r)).toFixed(2) + '　　' +
+      '(q/p)^1001000 = 10^' + (1001000 * Math.log10(r)).toFixed(0) + '</span><br>' +
+      '分母与分子同阶，比值 → <b style="color:#e74c3c">100.00%</b><br>' +
+      '<span class="mini">结论：p &lt; 0.5 时，只要你不下桌，破产不是"可能"，是"必然"。' +
+      '庄家的资金有多大根本不重要——因为优势在他那边，时间越长你越接近 0。</span>' +
+    '</div>' +
+    '<div class="hr"></div>' +
+    '<div class="note" style="line-height:2">' +
+      '<b style="color:#d4af37">③ 倍投法为什么必死</b><br>' +
+      '台面限额 ¥500 意味着：¥10 → ¥20 → ¥40 → ¥80 → ¥160 → ¥320 → 下一注需要 ¥640，超过限额。<br>' +
+      '也就是说，<b>连输 6 局</b>你就无法再翻倍。连输 6 局的概率 = (1 − 0.4865)⁶ ≈ ' +
+      '<b>' + pct(Math.pow(1 - P_ROULETTE, 6)) + '</b>。<br>' +
+      '在 1,000 局里，出现一次连续 6 输的概率 ≈ 1 − (1 − ' + (Math.pow(1 - P_ROULETTE, 6)).toFixed(5) +
+      ')^995 ≈ <b style="color:#e74c3c">100%</b>。<br>' +
+      '<span class="mini">倍投不改变期望，它只是把"很多次小赢"和"一次全输"打包在一起卖给你。' +
+      '而那个"一次"，在 1,000 局里一定会来。</span>' +
+    '</div>';
+}
+$('#btnRunStrat').onclick = runStrategyLab;
+$('#btnDerive').onclick = () => {
+  const b = $('#deriveBox');
+  b.classList.toggle('hide');
+  $('#btnDerive').textContent = b.classList.contains('hide') ? '📐 展开推导：赌徒破产问题' : '📐 收起推导';
+};
+
+/* ============================================================================
+   §6 万人模拟器
+   ============================================================================ */
+const SIM_N = 10000, SIM_R = 2000, SIM_START = 1000, SIM_BASE = 10, SIM_SAMPLE = 50;
+const SIM_STEPS = SIM_R / SIM_SAMPLE + 1;          // 41
+const Sim = { running:false, edge:0.0405, tid:'sport',
+  paths:null, finals:null, bust:0, winCount:0, survSum:0, survN:0, drew:0 };
+
+function fillSimGames(){
+  const sel = $('#simGame');
+  sel.innerHTML = TABLES.map(t => '<option value="' + t.id + '">' + t.icon + ' ' + t.name +
+    '（优势 ' + pct(t.edge) + '）</option>').join('');
+  sel.value = Sim.tid;
+  sel.onchange = () => {
+    Sim.tid = sel.value;
+    Sim.edge = EDGE[Sim.tid];
+    $('#simGameName').textContent = T[Sim.tid].name;
+    $('#simEdge').textContent = pct(Sim.edge);
+    const p = (1 - Sim.edge) / 2;
+    const exp = SIM_R * SIM_BASE * Sim.edge;
+    const sd = Math.sqrt(SIM_R) * SIM_BASE * 2 * Math.sqrt(p * (1 - p));
+    $('#simStatus').innerHTML = '预期：2,000 局后平均亏损 <b>' + yuan0(exp) + '</b>，' +
+      '标准差约 <b>' + yuan0(sd) + '</b>　→　预计约 <b>' + pct(normSurv(exp, sd), 1) + '</b> 的人还在赢';
+  };
+  sel.onchange();
+}
+function normSurv(mu, sd){       // P(最终资金 > 起始) ≈ P(Z > mu/sd)
+  const z = mu / sd;
+  return 1 - normCdf(z);
+}
+function normCdf(z){
+  const t = 1 / (1 + 0.2316419 * Math.abs(z));
+  const d = 0.3989423 * Math.exp(-z * z / 2);
+  let p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+  return z > 0 ? 1 - p : p;
+}
+function runSim(){
+  if (Sim.running) return;
+  Sim.running = true;
+  $('#btnRunSim').disabled = true;
+  $('#simResult').classList.remove('hide');
+  $('#momentsBox').innerHTML = '';
+  const p = (1 - Sim.edge) / 2;
+  Sim.paths = new Float32Array(SIM_N * SIM_STEPS);
+  Sim.finals = new Float32Array(SIM_N);
+  Sim.bust = 0; Sim.winCount = 0; Sim.survSum = 0; Sim.survN = 0; Sim.drew = 0;
+  clearRain();
+  const t0 = performance.now();
+  let done = 0;
+  const CHUNK = 1000;
+  const step = () => {
+    const to = Math.min(SIM_N, done + CHUNK);
+    for (let i = done; i < to; i++){
+      let bal = SIM_START, dead = false;
+      Sim.paths[i * SIM_STEPS] = bal;
+      for (let r = 0; r < SIM_R; r++){
+        if (bal < SIM_BASE){ dead = true; break; }
+        if (Math.random() < p) bal += SIM_BASE; else bal -= SIM_BASE;
+        if ((r + 1) % SIM_SAMPLE === 0) Sim.paths[i * SIM_STEPS + (r + 1) / SIM_SAMPLE] = bal;
+      }
+      if (dead){
+        Sim.bust++;
+        bal = 0;
+      } else { Sim.survSum += bal; Sim.survN++; if (bal > SIM_START) Sim.winCount++; }
+      Sim.finals[i] = bal;
+    }
+    done = to;
+    $('#simStatus').innerHTML = '生成中… ' + Math.round(done / SIM_N * 100) + '%';
+    if (done < SIM_N){ requestAnimationFrame(step); }
+    else {
+      const ms = Math.round(performance.now() - t0);
+      Sim.simMs = ms;
+      showSimKpi(ms);
+      drawRainProgressively();
+    }
+  };
+  requestAnimationFrame(step);
+}
+function clearRain(){
+  const cv = $('#cvRain'), ctx = cv.getContext('2d');
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  ctx.fillStyle = '#0b0b0b'; ctx.fillRect(0, 0, cv.width, cv.height);
+  /* 网格 */
+  ctx.strokeStyle = '#181818'; ctx.lineWidth = 1;
+  for (let i = 1; i < 5; i++){ const y = cv.height * i / 5;
+    ctx.beginPath(); ctx.moveTo(30, y); ctx.lineTo(cv.width - 8, y); ctx.stroke(); }
+  ctx.fillStyle = '#4a4a4a'; ctx.font = '10px monospace';
+  ctx.fillText('¥1,000 起始', 32, 12);
+  ctx.fillText('¥0 破产', 32, cv.height - 5);
+  ctx.fillText('局数 → 2,000', cv.width - 92, cv.height - 5);
+}
+function drawRainProgressively(){
+  const cv = $('#cvRain'), ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height, padL = 30, padR = 8, padT = 14, padB = 16;
+  /* 纵轴上限取 99.5 分位，让绝大多数轨迹铺满画布而不是挤在底部 */
+  const sorted = Array.from(Sim.finals).sort((a, b) => a - b);
+  let maxBal = sorted[Math.floor(sorted.length * 0.995)] || SIM_START;
+  maxBal = clamp(maxBal, SIM_START * 1.5, SIM_START * 8);
+  const X = s => padL + (W - padL - padR) * (s / (SIM_STEPS - 1));
+  const Y = v => H - padB - (H - padT - padB) * Math.min(1, v / maxBal);
+  let i = 0;
+  const BATCH = 400;
+  const step = () => {
+    /* 输家：暗红一片，是这张图的主体 */
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(168,46,32,0.16)';
+    ctx.beginPath();
+    const to = Math.min(SIM_N, i + BATCH);
+    for (; i < to; i++){
+      if (Sim.finals[i] > SIM_START) continue;
+      const base = i * SIM_STEPS;
+      ctx.moveTo(X(0), Y(Sim.paths[base]));
+      for (let s = 1; s < SIM_STEPS; s++) ctx.lineTo(X(s), Y(Sim.paths[base + s]));
+    }
+    ctx.stroke();
+    if (i < SIM_N){ requestAnimationFrame(step); }
+    else {
+      /* 赢家：少数几条绿线浮在暗红之上 —— 这就是你在朋友圈看到的那几条 */
+      ctx.strokeStyle = 'rgba(72,208,132,0.3)'; ctx.lineWidth = 0.6;
+      ctx.beginPath();
+      for (let k = 0; k < SIM_N; k++){
+        if (Sim.finals[k] <= SIM_START) continue;
+        const base = k * SIM_STEPS;
+        ctx.moveTo(X(0), Y(Sim.paths[base]));
+        for (let s = 1; s < SIM_STEPS; s++) ctx.lineTo(X(s), Y(Sim.paths[base + s]));
+      }
+      ctx.stroke();
+      /* 纵轴刻度 */
+      ctx.fillStyle = '#4a4a4a'; ctx.font = '10px monospace';
+      for (let g = 1; g <= 4; g++){
+        const v = maxBal * g / 4;
+        ctx.fillText('¥' + Math.round(v), 2, Y(v) + 3);
+      }
+      $('#simStatus').innerHTML = '完成：10,000 人 × 2,000 局 = <b>20,000,000</b> 局，用时 <b>' +
+        Sim.simMs + ' ms</b>';
+      $('#btnRunSim').disabled = false;
+      Sim.running = false;
+      $('#btnMoments').disabled = false;
+    }
+  };
+  requestAnimationFrame(step);
+}
+function showSimKpi(ms){
+  const bustPct = Sim.bust / SIM_N, winPct = Sim.winCount / SIM_N;
+  const losers = Math.round((1 - winPct) * SIM_N);
+  $('#simKpi').innerHTML =
+    '<div><div class="v" style="color:#e74c3c">' + pct(bustPct, 1) + '</div><div class="k">破产（资金 &lt; 一注）</div></div>' +
+    '<div><div class="v">' + yuan0(Sim.survN ? Sim.survSum / Sim.survN : 0) + '</div><div class="k">存活者平均资金</div></div>' +
+    '<div><div class="v" style="color:#27ae60">' + pct(winPct, 2) + '</div><div class="k">只有这么多人还在赢</div></div>' +
+    '<div><div class="v">' + losers.toLocaleString() + '</div><div class="k">今晚安静锁屏的人</div></div>' +
+    '<div><div class="v" style="font-size:15px">' + ms + ' ms</div><div class="k">模拟耗时</div></div>';
+  Sim.losers = losers;
+}
+$('#btnRunSim').onclick = runSim;
+
+const MOMENT_POSTS = [
+  ['今晚手气不错[偷笑]', '这个月生活费回来了'],
+  ['跟对大神了！', '老师带单真的稳'],
+  ['连中 7 把，我这运气没谁了', ''],
+  ['回本了，明天继续', ''],
+  ['刚试了提现，秒到账，这平台是真的', ''],
+  ['感谢群里兄弟，今天 +3800', ''],
+  ['本金 2000 打到 1 万 5，截图留念', ''],
+  ['兄弟们冲，我在群里等你们', ''],
+  ['就玩一把，结果一晚上没睡', '']
+];
+const MOMENT_AVATARS = ['🦁','🐯','🐼','🦊','🐸','🐵','🦉','🐺','🐨'];
+$('#btnMoments').onclick = () => {
+  const winners = [];
+  for (let i = 0; i < SIM_N; i++) if (Sim.finals[i] > SIM_START) winners.push(i);
+  if (!winners.length){ $('#momentsBox').innerHTML = '<div class="note">这一轮没有人赢。换一桌试试？</div>'; return; }
+  /* 晒单的从来不是"赢了一点"的人，是赢得最多的那批 —— 取前 60 名再随机挑 9 个 */
+  winners.sort((a, b) => Sim.finals[b] - Sim.finals[a]);
+  const top = winners.slice(0, Math.min(60, winners.length));
+  shuffle(top);
+  const cards = MOMENT_POSTS.slice(0, 9).map((post, k) => {
+    const idx = top[k % top.length];
+    const bal = Math.round(Sim.finals[idx]);
+    const start = SIM_START;
+    return '<div class="mom" style="animation-delay:' + (k * 0.09) + 's">' +
+      '<div class="hd"><div class="av">' + MOMENT_AVATARS[k] + '</div>' +
+        '<div><div class="nm">同学 ' + String.fromCharCode(65 + k) + '</div>' +
+        '<div class="mini" style="font-size:10px">刚刚</div></div></div>' +
+      '<div class="tx">' + post[0] + (post[1] ? '<br><span style="color:#8d8d8d">' + post[1] + '</span>' : '') + '</div>' +
+      '<div class="pic">账户余额　<b>¥' + bal.toLocaleString('zh-CN') + '</b><br>' +
+        '本金 ¥1,000 → 盈利 <span>+¥' + (bal - start).toLocaleString('zh-CN') + '</span></div>' +
+      '</div>';
+  }).join('');
+  const topWin = Math.round(Sim.finals[winners[0]]);
+  $('#momentsBox').innerHTML =
+    '<div class="hr"></div>' +
+    '<div class="note" style="color:#e8dcc8;font-size:14.5px;line-height:1.95">' +
+      '你朋友圈里晒赢钱截图的，就是这些人。<br>' +
+      '剩下 <b style="color:#e74c3c">' + Sim.losers.toLocaleString() + '</b> 个输家，今晚安静地锁上了屏幕。' +
+    '</div>' +
+    '<div class="mini">（本轮 10,000 人中，最终资金高于本金的共 <b>' + Sim.winCount.toLocaleString() +
+      '</b> 人，占 ' + pct(Sim.winCount / SIM_N, 2) + '。这里从<b>赢得最多的 60 人</b>里随机截取了 9 条——' +
+      '朋友圈只会给你看这个。全场赢得最多的人，账户余额是 ¥' + topWin.toLocaleString('zh-CN') + '。）</div>' +
+    '<div class="moments">' + cards + '</div>' +
+    '<div class="mini" style="margin-top:10px">' +
+      '注意：这些"截图"里的数字全部来自上面那场真实模拟——他们确实赢了。' +
+      '幸存者偏差的意思是：你只看得见这 ' + pct(Sim.winCount / SIM_N, 1) + '，看不见另外 ' +
+      pct(1 - Sim.winCount / SIM_N, 1) + '。<br>' +
+      '而且看清楚：<b>即使是全场赢得最多的那个人，也只赢了 ¥' + topWin.toLocaleString('zh-CN') +
+      ' 本金里的一部分</b>；而 9,000 多个输家，输掉的是全部本金。' +
+      '赌局从来不是"有人赢有人输"，是<b>庄家赢，所有人输</b>。' +
+    '</div>';
+  $('#momentsBox').scrollIntoView({behavior:'smooth', block:'nearest'});
+};
+viewHooks['v-sim'] = { enter(){ fillSimGames(); } };
+
+/* ============================================================================
+   §7 人生账单 + 债务滑坡 + 法律求助 + 收尾
+   ============================================================================ */
+const DEBT_STEPS = [
+  { lv:'第 1 级', ttl:'¥100 · 出于好奇', txt:'"就充一百块试试，输了就删。"——几乎所有赌徒的第一句话都一样。这个阶段的特征是：你赢了，而且提现成功了。' },
+  { lv:'第 2 级', ttl:'¥500 · 想翻本', txt:'"再来一把就回本。"——沉没成本谬误开始接管你的判断。你把已经输掉的钱当成"本来属于我的钱"，' +
+      '于是每一注都变成了"夺回"而不是"下注"。' },
+  { lv:'第 3 级', ttl:'¥5,000 · 借遍同学', txt:'"下周就还你。"——开始向室友、同学、社团朋友借钱，理由从"家里急用"变成"周转一下"。' +
+      '你开始躲避微聊群，开始计算每个人的还款日。' },
+  { lv:'第 4 级', ttl:'¥20,000 · 网贷缠身', txt:'"随借随还。"——网贷平台在你最脆弱的时候递上绳子。' +
+      '逾期后是违约金、催收电话、通讯录轰炸。到这一步，你已经不是在做数学题了，你在做生存题。' },
+  { lv:'第 5 级', ttl:'停学 / 催收 / 家庭破裂', txt:'2016 年，21 岁大学生郑兴强（化名）迷上赌球，从多个网贷平台借款，无力偿还后被催债者威逼，' +
+      '给父母发完"别给我收尸，太丢人"的短信后跳楼身亡，遗物仅剩 38.5 元。此案还牵连同班及同宿舍共 28 名学生被卷入借贷，' +
+      '涉款初步统计达 58 万元。（据公开报道）' }
+];
+let stepLit = 0;
+function renderSteps(){
+  $('#stepsBox').innerHTML = DEBT_STEPS.map((s, i) =>
+    '<div class="step' + (i < stepLit ? ' on' : '') + '">' +
+      '<div class="lv">' + s.lv + '</div><div class="ttl">' + s.ttl + '</div>' +
+      '<div class="txt">' + s.txt + '</div></div>').join('') +
+    '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #2a2a2a;' +
+      'font-size:13.5px;color:#e8b4ac;font-weight:700;line-height:1.8">' +
+      '这五级台阶，是所有网赌案例里重复出现的同一条路。</div>';
+  $('#btnStepNext').textContent = stepLit >= DEBT_STEPS.length ? '已全部点亮' : '点亮下一级 →';
+  $('#btnStepNext').disabled = stepLit >= DEBT_STEPS.length;
+}
+$('#btnStepNext').onclick = () => { stepLit = Math.min(DEBT_STEPS.length, stepLit + 1); renderSteps(); };
+
+/* §7 v1.2 瘦身版：只留三行提示与求助渠道，不放条文、不放条号
+   （法条集中到 §13.3 冻结页这一处） */
+const LAWS = [
+  ['参与网络赌博违法，赌资较大的可被拘留、罚款。'],
+  ['网赌平台的钱来自境外——那是电信诈骗骗来的赃款。你提现的那一刻，接收的就是赃款。'],
+  ['已陷进去的人：全国反诈专线 <span class="hot">96110</span> ｜ 报警 <span class="hot">110</span> ｜ ' +
+   '学校心理咨询中心 / 辅导员。<br>别独自"再赌一把把钱赢回来"——这是所有案例里共同的第一步。']
+];
+
+function renderBill(){
+  const lost = Math.max(0, S.totalStaked - S.totalReturned);
+  const mins = Math.floor(S.seconds / 60);
+  const fund = lost * FUND_RATE;
+  const rows = [
+    ['总充值', yuan0(S.recharged)],
+    ['总下注（有效投注）', yuan0(S.totalStaked)],
+    ['总返还', yuan0(S.totalReturned)],
+    ['总亏损', yuan0(lost)],
+    ['破产次数', S.bankruptCount + ' 次'],
+    ['游玩时长', mins + ' 分 ' + (S.seconds % 60) + ' 秒']
+  ];
+  const conv = lost <= 0 ? [] : [
+    ['学校食堂饭菜', Math.floor(lost / CONV.meal.unit) + ' 顿', '（¥15/顿）'],
+    ['蜜雪冰城柠檬水', Math.floor(lost / CONV.lemon.unit) + ' 杯', '（¥4/杯）'],
+    ['手机话费', (Math.round(lost / CONV.phone.unit * 10) / 10) + ' 个月', '（¥50/月）'],
+    ['父母的工作时间', (Math.round(lost / CONV.wage.unit * 10) / 10) + ' 小时', '（时薪 ¥20）'],
+    ['一个月生活费', (Math.round(lost / CONV.month.unit * 100) / 100) + ' 个月', '（¥1,500/月）'],
+    ['一学年学费+住宿', (Math.round(lost / CONV.year.unit * 1000) / 1000) + ' 学年', '（¥8,000/学年）'],
+    ['主流跑鞋', (Math.round(lost / CONV.shoe.unit * 10) / 10) + ' 双', '（¥500/双）'],
+    ['主流手机', (Math.round(lost / CONV.mobile.unit * 100) / 100) + ' 部', '（¥4,500/部）']
+  ];
+  $('#billBox').innerHTML =
+    '<div class="mini">数据来自你本次游玩的真实记录（全部为虚拟货币，1 币 = 1 元）。</div>' +
+    '<div style="margin-top:10px">' + rows.map(r =>
+      '<div class="bill-line"><span>' + r[0] + '</span><b>' + r[1] + '</b></div>').join('') +
+      '<div class="bill-line total"><span>你今天（虚拟）输掉的钱</span><b>' + yuan0(lost) + '</b></div>' +
+    '</div>' +
+    (conv.length ?
+      '<div class="hr"></div>' +
+      '<div style="font-size:13px;color:#c9bda0;margin-bottom:6px">换算清单 —— 这些钱本来可以换成：</div>' +
+      conv.map(c => '<div class="bill-line"><span>' + c[0] +
+        ' <span class="mini">' + c[2] + '</span></span><b>' + c[1] + '</b></div>').join('') +
+      '<div class="hr"></div>' +
+      '<div class="bill-line"><span>如果这些钱存货币基金一年（年化 1.5%）</span><b>¥' + fund.toFixed(2) + '</b></div>'
+      : '<div class="hr"></div><div class="note">你还没有输钱。要么你还没开始，要么你刚刚开始。</div>') +
+    '<div class="hr"></div>' +
+    '<div class="mini">累计充值 <b style="color:#e07a6a">' + yuan0(S.recharged) + '</b>　' +
+      '累计有效投注 <b>' + yuan0(S.totalBetVolume) + '</b>　' +
+      '提现门槛（充值额 ×20）<b>' + yuan0(S.recharged * 20) + '</b>' +
+      (S.recharged > 0 && S.totalBetVolume < S.recharged * 20
+        ? '　<span style="color:#e74c3c">流水未达标，一分钱也提不出来。</span>' : '') +
+    '</div>';
+  $('#lawBox').innerHTML =
+    LAWS.map(l => '<div style="margin-bottom:11px;line-height:1.95">· ' + l[0] + '</div>').join('') +
+    /* §13.5.4：结算页统一点破所有拟真道具 */
+    '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #262626;' +
+      'font-size:13px;color:#8fc7dd;line-height:1.95">' +
+      '<b style="color:#d6eef8">最后，点破几件事：</b><br>' +
+      '· 大厅顶部滚动的那些"提现到账""爆出大奖"播报，全是编的；' +
+      '<span style="color:#d6eef8">真实网赌平台上的那些，也全是编的</span>——' +
+      '它们唯一的目的，是让你相信别人赢了。<br>' +
+      '· 右下角客服说的每一句话，都是话术脚本。<br>' +
+      '· <span style="color:#d6eef8">VIP5 承诺的"3 分钟极速提现"也是假的</span>——' +
+      '等级越高，只是让你充得越多。<br>' +
+      (ACCT && ACCT.watch
+        ? '· 你这个账号（<span style="color:#d6eef8">#' + ACCT.id + '</span>）在注册那一刻就被打了标签：' +
+          '<span style="color:#d6eef8">重点关照</span>——提现门槛只有别人的一半。' +
+          '不是你运气不好，是你被选中了。<br>'
+        : '· 有些账号，从注册那一刻就被标记了（本机 10% 的昵称会命中）。' +
+          '不是你运气不好，是你被选中了。<br>') +
+      '· 连输之后那个开始闪烁的 <span style="color:#d6eef8">"全押"按钮</span>、' +
+      '输光后自动跳到更贵档位的充值弹窗、那句"一把回本，就差这一把"——' +
+      '<span style="color:#d6eef8">都是设计好的，不是你的运气</span>。' +
+      '真实的网赌 APP 全都有这套东西。<br>' +
+      (S.frozen
+        ? '· 你的账户已经被冻结了（模拟）。这不是剧情需要，这是真实案例里最常见的结局。'
+        : '· 今晚有 <span style="color:#d6eef8">1 成</span>的玩家赢到了钱、点下了提现——然后卡被冻结了。' +
+          '（本软件里你也可以试试：赢够了钱再点一次"提现"。）') +
+    '</div>';
+}
+$('#btnFinale').onclick = () => {
+  const f = $('#finale');
+  f.classList.remove('hide');
+  f.innerHTML =
+    '<div class="q fadein">你在屏幕这头赌运气，<br>' +
+    '屏幕那头，有人在<span class="r">调参数</span>、<br>写话术、算赔率。<br><br>' +
+    '<em>十赌九骗，还有一个，是庄家自己。</em>' +
+    '<div style="margin-top:38px"><button class="btn s" style="width:auto;padding:11px 22px;display:inline-block" id="finClose">返回</button></div>' +
+    '</div>';
+  $('#finClose').onclick = () => f.classList.add('hide');
+};
+viewHooks['v-bill'] = { enter(){ renderBill(); renderSteps(); } };
+
+/* ============================================================================
+   §9 关于页：理论知识点对照表 + 全局参数
+   ============================================================================ */
+const THEORY = [
+  ['骰宝 / 大小单双', '古典概型、期望', '6³ = 216 个等可能结果；豹子通吃把胜率砍到 48.61%'],
+  ['时时彩', '大数定律、中心极限定理', '5 位数字之和近似正态；期望亏损 = 0.01 × n × 注额'],
+  ['百家乐', '期望、条件概率', '押和优势 14.36%，是押庄（1.06%）的 13 倍'],
+  ['老虎机', '几何分布、独立性、赌徒谬误', 'E[X] = 1/p ≈ 37,037 次才等到一个 7️⃣ 大奖'],
+  ['体育赌球', '期望、概率归一化', '隐含概率之和 104.22%，差额即无风险抽水；串关抽水复利'],
+  ['龙虎斗', '期望与方差、频率效应', '8 副牌真发牌，P(和)=31/415；押和优势 32.77% 比百家乐还毒一倍'],
+  ['红包扫雷', '频率与概率、分布偏倚', '实测尾数分布均匀（每个 ≈10%），真正的杀招是不对称赔率'],
+  ['策略实验室', '赌徒破产问题（随机游走）、蒙特卡洛', 'p &lt; 0.5 时破产概率 → 100%；可选停时定理'],
+  ['万人模拟器', '大数定律、蒙特卡洛、直方图', '10,000 人 × 2,000 局的资金轨迹分布']
+];
+const PARAMS = [
+  ['骰宝 · 押大/押小', 'P = 105/216 = 48.61%', '庄家优势 2.78%'],
+  ['时时彩 · 大小', 'P = 50%（严格对半）', '庄家优势 1.00%（赔 1:0.98）'],
+  ['时时彩 · 独胆', 'P = 1/10 = 10%', '庄家优势 2.00%（赔 1:8.8，公平值 9）'],
+  ['百家乐 · 押庄', 'P = 45.86%', '庄家优势 1.06%（赔 1:0.95）'],
+  ['百家乐 · 押闲', 'P = 44.62%', '庄家优势 1.24%（赔 1:1）'],
+  ['百家乐 · 押和', 'P = 9.52%', '庄家优势 14.36%（赔 1:8）'],
+  ['老虎机', 'RTP = 92.00%', '庄家优势 8.00%（¥10/拉）'],
+  ['体育赌球', '隐含概率和 = 104.22%', '抽水 4.22% ｜ 每种下注期望 −4.05%'],
+  ['赌球 · 2 串 1', '抽水复利 1−(1−4.05%)²', '实际优势 ≈ 7.94%'],
+  ['龙虎斗 · 押龙/虎', 'P = 192/415 = 46.27% ｜ P(和) = 7.47%', '庄家优势 3.74%（8 副牌真发牌，和局退半）'],
+  ['龙虎斗 · 押和', 'P = 31/415 = 7.47%', '庄家优势 32.77%（赔 1:8）'],
+  ['红包扫雷', '尾数均匀，每个 ≈ 10.0%', '庄家优势 50.00%（底注 ¥10 + 中雷赔 5 倍）'],
+  ['策略实验室', '轮盘 p = 18/37 = 48.65%', '庄家优势 2.70%'],
+  ['后台调参（账号级，7 桌全部生效）', '养鱼期额度与倍率、杀猪期倍率由账号哈希决定（见 🔧 后台）', '—']
+];
+function renderAbout(){
+  $('#theoryTbl').innerHTML = '<tr><th>模块</th><th>课内知识点</th><th>核心结论</th></tr>' +
+    THEORY.map(r => '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>').join('');
+  $('#paramTbl').innerHTML = '<tr><th>项目</th><th>概率 / 赔率</th><th>庄家优势</th></tr>' +
+    PARAMS.map(r => '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>').join('');
+}
+viewHooks['v-about'] = { enter: renderAbout };
+
+/* ============================================================================
+   初始化
+   ============================================================================ */
+function init(){
+  buildNav();
+  renderAbout();
+  renderMarquee();
+  renderBanners();
+  fillSimGames();
+  renderSteps();
+  $('#btnWithdraw').onclick = openWithdraw;
+  $('#btnRecharge').onclick = () => { if (!frozenBlock()) openRecharge(); };
+  /* §15.2 👁 点开/收起冷色忠告，状态持久化 */
+  $('#eyeCold').onclick = () => {
+    coldOpen = !coldOpen;
+    Store.set('jdc_cold', coldOpen);
+    applyCold();
+  };
+  $('#acctChip').onclick = () => openAccountPanel(false);
+  $('#btnLeave').onclick = leaveCasino;
+  $('#btnLeaveBill').onclick = leaveCasino;
+  applyCold();
+  /* §13.1 启动页 → 结束后解析账号（§18.1：首次打开要求注册）
+     §3.1：hash 带 nick= 时自动登录（主页图标点进来就是这条路径），规范化后为空则照常弹注册面板；
+           hash 为 #wrench 时进账号后直接开后台。 */
+  runSplash(() => {
+    const q = hashQuery();
+    const want = normalizeNick(q.nick);
+    if (q.nick !== undefined && !want){ openAccountPanel(true); return; }
+    const cur = Store.get(K_CUR, null);
+    const nick = want || (cur && acctList().indexOf(cur) >= 0 ? cur : null);
+    if (!nick){ openAccountPanel(true); return; }
+    pendingWrench = !!q.wrench;
+    enterAccount(nick, false);
+  });
+
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+else init();
+</script>
+</body>
+</html>
